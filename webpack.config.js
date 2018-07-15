@@ -8,17 +8,29 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js'
   },
-  devtool: "inline-source-map",
+  devtool: 'inline-source-map',
   resolve: {
-    extensions: [".ts", ".tsx", ".js"]
+    extensions: ['.ts', '.tsx', '.js']
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: ["ts-loader"]
+        use: ['ts-loader']
+      },
+      {
+        test: /\.s[ac]+ss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'sass-loader'
+        ]
       },
     ]
+  },
+
+  externals: {
+    'twitch-ext-helper': 'Twitch.ext',
   },
 
   devServer: {

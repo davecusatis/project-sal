@@ -1,7 +1,8 @@
-import * as React from "react";
+import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { initApp, app } from "./core/app";
-import { DevConfig } from "./core/config";
+import { initApp, app } from './core/app';
+import { DevConfig } from './core/config';
+import { Root } from './pages/root';
 
 initApp(new DevConfig());
 

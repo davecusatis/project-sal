@@ -8,7 +8,7 @@ import { Route } from 'react-router';
 const routes: RouteEntry[] = [
   {
     index: 0,
-    title: 'Playlist',
+    title: 'Slot Machine',
     path: '/',
     exact: true,
     component: SlotMachinePage,
@@ -31,6 +31,5 @@ const routes: RouteEntry[] = [
 
 export function renderRoutes(): JSX.Element[] {
   return routes.map((route: RouteEntry): JSX.Element =>
-    <Route key={route.index} exact={route.exact} path={route.path} component={route.component} />)
-    ;
+    <Route key={route.index} exact={route.exact} path={route.path} component={route.component} />);
 }

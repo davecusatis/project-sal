@@ -4,7 +4,9 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { Session } from './models/session';
-
+import * as sessionActions from './actions/session';
+import * as contextActions from './actions/context';
+import * as slotMachineActions from './actions/slot-machine';
 export let app: App;
 export let config: typeof app.config;
 export let store: typeof app.store;
@@ -31,14 +33,12 @@ export class App {
     this.store = new Store();
 
     window.Twitch.ext.onAuthorized((auth: Session) => {
-      //   this.store.dispatch(sessionActions.onAuthorized(auth));
-      //   this.store.dispatch(playlistActions.updatePlaylist(auth.token));
-      //   this.store.dispatch(songlistActions.updateSonglist(auth.token));
+      this.store.dispatch(sessionActions.onAuthorized(auth));
       console.log(auth);
     });
 
     window.Twitch.ext.onContext((context: any) => {
-      // this.store.dispatch(contextActions.onContext(context));
+      this.store.dispatch(contextActions.onContext(context));
       console.log(context);
     });
 
@@ -49,12 +49,9 @@ export class App {
     window.Twitch.ext.listen('broadcast', (target: any, contentType: any, message: any) => {
       message = JSON.parse(message);
       switch (message.type) {
-        // case 'playlistUpdated':
-        //   this.store.dispatch(playlistActions.playlistUpdated(message.data.playlist));
-        //   break;
-        // case 'songlistUpdated':
-        //   this.store.dispatch(songlistActions.songlistUpdated(message.data.songlist));
-        //   break;
+        case 'scoreUpdated':
+          this.store.dispatch(slotMachineActions.scoreUpdated(message.data.score));
+          break;
         default:
           break;
       }

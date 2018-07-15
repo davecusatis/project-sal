@@ -1,4 +1,4 @@
-import { GlobalState } from "../../core/models/global-state";
+import { GlobalState } from '../../core/models/global-state';
 import { linkIdentity } from '../../core/actions/session';
 import { isLinkedAccount } from '../../core/reducers/session';
 import { ReduxStateProps, RootComponent, PublicProps, ReduxDispatchProps } from './component';

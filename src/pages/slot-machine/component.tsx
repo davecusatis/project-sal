@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { RouteComponentProps, Switch, Redirect } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 import { Context } from '../../core/models/context';
 import { Session } from '../../core/models/session';
-
+import { SlotMachine } from '../../components/slot-machine';
 interface State {
 }
 export interface PublicProps { }
@@ -16,7 +16,9 @@ type Props = PublicProps & ReduxStateProps & RouteProps;
 export class SlotMachinePageComponent extends React.Component<Props, State> {
   public render() {
     return (
-      <></>
+      <div>
+        <SlotMachine />
+      </div>
     );
   }
 }

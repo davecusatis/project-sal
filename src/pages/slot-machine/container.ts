@@ -1,8 +1,9 @@
-import { GlobalState } from "../../core/models/global-state";
+import { GlobalState } from '../../core/models/global-state';
 import { getContext } from '../../core/reducers/context';
 import { getSession } from '../../core/reducers/session';
 import { ReduxStateProps, SlotMachinePageComponent, PublicProps } from './component';
 import { connect } from 'react-redux';
+import { spinning, getLastScore } from '../../core/reducers/slot-machine';
 
 function mapStateToProps(state: GlobalState): ReduxStateProps {
   return {
