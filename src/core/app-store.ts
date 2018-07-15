@@ -1,10 +1,10 @@
-import { Config } from './config';
-import { applyMiddleware, compose, createStore, Reducer, combineReducers, Store as ReduxStore } from 'redux';
+import { applyMiddleware, createStore, Reducer, combineReducers, Store as ReduxStore } from 'redux';
 import thunk from 'redux-thunk';
 import { Action } from './models/actions';
 import { GlobalState } from './models/global-state';
 import { contextReducer } from './reducers/context';
 import { sessionReducer } from './reducers/session';
+import { slotMachineReducer } from './reducers/slot-machine';
 
 interface AppState {
   [key: string]: object;
@@ -18,6 +18,7 @@ export class Store {
     return combineReducers({
       context: contextReducer,
       session: sessionReducer,
+      slotMachine: slotMachineReducer,
     });
   }
 

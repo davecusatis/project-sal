@@ -10,7 +10,7 @@ export const getInitialState = (): SlotMachineState => ({
   spinning: false,
 });
 
-export function sessionReducer(state = getInitialState(), action: slotMachineActions.All): SlotMachineState {
+export function slotMachineReducer(state = getInitialState(), action: slotMachineActions.All): SlotMachineState {
   switch (action.type) {
     case slotMachineActions.PLAY:
       return {
