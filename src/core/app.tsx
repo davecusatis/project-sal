@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { Session } from './models/session';
+
 export let app: App;
 export let config: typeof app.config;
 export let store: typeof app.store;
@@ -27,7 +28,7 @@ export class App {
 
   constructor(configuration: Config) {
     this.config = configuration;
-    this.store = new Store(this.config);
+    this.store = new Store();
 
     window.Twitch.ext.onAuthorized((auth: Session) => {
       //   this.store.dispatch(sessionActions.onAuthorized(auth));

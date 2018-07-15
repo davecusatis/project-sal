@@ -1,9 +1,12 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { MemoryRouter } from 'react-router-dom';
+import { initApp, app } from "./core/app";
+import { DevConfig } from "./core/config";
 
-import { Hello } from "./components/sal";
+initApp(new DevConfig());
 
-ReactDOM.render(
-    <Hello compiler="TypeScript" framework="React" />,
-    document.getElementById("root")
-);
+app.mount((
+    <MemoryRouter>
+        <Root />
+    </MemoryRouter>
+), document.getElementById('root')!);

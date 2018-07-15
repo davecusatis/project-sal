@@ -21,7 +21,7 @@ export class Store {
     });
   }
 
-  constructor(config: Config) {
+  constructor() {
     this.rootReducer = this.initRootReducer();
 
     this.reduxStore = createStore(
