@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { PlayLever } from '../play-lever';
+import { Canvas } from '../canvas';
 
 export interface PublicProps {
 }
@@ -11,10 +12,6 @@ export interface ReduxStateProps {
 
 type Props = PublicProps & ReduxStateProps;
 export class SlotMachineComponent extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props);
-  }
-
   private renderSpinning(): JSX.Element {
     return (
       <div> Spinning </div>
@@ -28,6 +25,7 @@ export class SlotMachineComponent extends React.Component<Props> {
         <PlayLever />
         {spinning && this.renderSpinning()}
         {lastScore}
+        <Canvas />
       </div>
     );
   }
