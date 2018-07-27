@@ -34,7 +34,6 @@ module.exports = {
       }
     ]
   },
-
   externals: {
     'twitch-ext-helper': 'Twitch.ext',
   },

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { PlayLever } from '../play-lever';
 import { Canvas } from '../canvas';
 
 export interface PublicProps {
@@ -22,10 +21,9 @@ export class SlotMachineComponent extends React.Component<Props> {
     const { spinning, lastScore } = this.props;
     return (
       <div>
-        <PlayLever />
+        <Canvas />
         {spinning && this.renderSpinning()}
         {lastScore}
-        <Canvas />
       </div>
     );
   }
