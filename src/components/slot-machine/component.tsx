@@ -22,8 +22,9 @@ export class SlotMachineComponent extends React.Component<Props> {
     return (
       <div>
         <Canvas />
+        <br />
         {spinning && this.renderSpinning()}
-        {lastScore}
+        Score: {lastScore}
       </div>
     );
   }

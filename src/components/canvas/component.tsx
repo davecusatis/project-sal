@@ -21,15 +21,15 @@ interface Point {
 
 interface State {
   slotImg: HTMLImageElement;
-  canvas?: HTMLCanvasElement;
-  offsetX?: number;
-  offsetY?: number;
+  currentBits: number;
 }
 
 interface PublicProps { }
 
 export interface ReduxStateProps {
   session: Session;
+  spinning: boolean;
+  lastScore: number;
 }
 
 export interface ReduxDispatchProps {
@@ -52,8 +52,8 @@ export class CanvasComponent extends React.Component<Props, State> {
 
     s.addEventListener('load', this.assetsLoaded.bind(this));
     this.state = {
-      canvas: c,
       slotImg: s,
+      currentBits: 0,
     };
   }
 
@@ -74,6 +74,7 @@ export class CanvasComponent extends React.Component<Props, State> {
         token
       }, play
     } = this.props;
+    const { currentBits: bits } = this.state;
 
     if (region) {
       switch (region.id) {
@@ -82,11 +83,19 @@ export class CanvasComponent extends React.Component<Props, State> {
           break;
 
         case 'plus':
-          console.log('incrementing bits');
+          if (bits < 10000) {
+            this.setState({
+              currentBits: bits + 100,
+            });
+          }
           break;
 
         case 'minus':
-          console.log('subtracting bits');
+          if (bits > 0) {
+            this.setState({
+              currentBits: bits - 100,
+            });
+          }
           break;
       }
     } else {
@@ -180,18 +189,21 @@ export class CanvasComponent extends React.Component<Props, State> {
     this.canvasRef.current.addEventListener('click', this.clickHandler.bind(this));
     this.canvasRef.current.width = this.state.slotImg.width;
     this.canvasRef.current.height = this.state.slotImg.height;
-    this.setState({
-      offsetX: this.canvasRef.current.getBoundingClientRect().left,
-      offsetY: this.canvasRef.current.getBoundingClientRect().top,
-    });
     const ctx = this.canvasRef.current.getContext('2d');
     ctx.drawImage(this.state.slotImg, 0, 0);
+
+    if (this.props.lastScore) {
+      ctx.font = '48px serif';
+      ctx.fillText(this.props.lastScore.toString(), 50, 50);
+    }
   }
 
   public render() {
     return (
       <>
         <canvas style={{ border: '1px solid black' }} ref={this.canvasRef} id='slotAnimation'></canvas>
+        <br />
+        Bits: {this.state.currentBits}
       </>
     );
   }

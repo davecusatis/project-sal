@@ -6,6 +6,9 @@ const api = new API();
 export const PLAY = 'core.slot-machine.PLAY';
 interface playAction extends Action<typeof PLAY> { }
 
+export const ERROR = 'core.slot-machine.ERROR';
+interface errAction extends Action<typeof ERROR> { }
+
 export const SCORE_RECEIVED = 'core.slot-machine.SCORE_RECEIVED';
 interface scoreReceivedAction extends Action<typeof SCORE_RECEIVED> {
   score: number;

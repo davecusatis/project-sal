@@ -4,10 +4,14 @@ import { Dispatch } from 'redux';
 import { CanvasComponent, ReduxStateProps, ReduxDispatchProps } from './component';
 import * as slotActions from '../../core/actions/slot-machine';
 import { getSession } from '../../core/reducers/session';
+import { spinning, getLastScore } from '../../core/reducers/slot-machine';
+
 
 function mapStateToProps(state: GlobalState): ReduxStateProps {
   return {
-    session: getSession(state)
+    session: getSession(state),
+    spinning: spinning(state),
+    lastScore: getLastScore(state)
   };
 }
 

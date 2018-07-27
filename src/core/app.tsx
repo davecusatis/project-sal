@@ -43,13 +43,14 @@ export class App {
     });
 
     window.Twitch.ext.onError((error: string | Error) => {
-
+      console.log(error);
     });
 
     window.Twitch.ext.listen('broadcast', (target: any, contentType: any, message: any) => {
       message = JSON.parse(message);
       switch (message.type) {
         case 'scoreUpdated':
+
           this.store.dispatch(slotMachineActions.scoreUpdated(message.data.score));
           break;
         default:
