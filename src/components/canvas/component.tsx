@@ -191,19 +191,25 @@ export class CanvasComponent extends React.Component<Props, State> {
     this.canvasRef.current.height = this.state.slotImg.height;
     const ctx = this.canvasRef.current.getContext('2d');
     ctx.drawImage(this.state.slotImg, 0, 0);
+  }
+
+  public render() {
+    let ctx: CanvasRenderingContext2D;
+    if (this.canvasRef.current) {
+      ctx = this.canvasRef.current.getContext('2d');
+      ctx.drawImage(this.state.slotImg, 0, 0);
+      ctx.font = '24px serif';
+      ctx.fillText('Bits: ' + this.state.currentBits.toString(), 50, 80);
+    }
 
     if (this.props.lastScore) {
       ctx.font = '48px serif';
       ctx.fillText(this.props.lastScore.toString(), 50, 50);
     }
-  }
 
-  public render() {
     return (
       <>
         <canvas style={{ border: '1px solid black' }} ref={this.canvasRef} id='slotAnimation'></canvas>
-        <br />
-        Bits: {this.state.currentBits}
       </>
     );
   }
