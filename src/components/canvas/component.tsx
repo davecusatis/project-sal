@@ -1,6 +1,9 @@
 import * as React from 'react';
 import * as slot from '../../assets/img/slots.jpg';
+import * as machine from '../../assets/img/machine.png';
 import { Session } from '../../core/models/session';
+
+const DEBUG = true;
 
 interface MousePosition {
   x: number;
@@ -48,7 +51,7 @@ export class CanvasComponent extends React.Component<Props, State> {
     const c = this.canvasRef.current;
 
     let s = new Image();
-    s.src = slot;
+    s.src = machine;
 
     s.addEventListener('load', this.assetsLoaded.bind(this));
     this.state = {
@@ -128,12 +131,20 @@ export class CanvasComponent extends React.Component<Props, State> {
   private getHandleRegion(): Region {
     const rect = this.canvasRef.current.getBoundingClientRect();
     const topleft = { x: rect.width * 0.85, y: rect.height * 0.475 };
-    const height = 50;
-    const width = 25;
+    const height = 120;
+    const width = 50;
+
+    const p = this.genRect(topleft.x, topleft.y, height, width);
+
+    if (DEBUG) {
+      const ctx = this.canvasRef.current.getContext('2d');
+      ctx.rect(p[0].x, p[0].y, width, height);
+      ctx.stroke();
+    }
 
     return {
       id: 'handle',
-      points: this.genRect(topleft.x, topleft.y, height, width),
+      points: p,
       height: height,
       width: width,
     };
@@ -141,13 +152,18 @@ export class CanvasComponent extends React.Component<Props, State> {
 
   private getPlusBitsRegion(): Region {
     const rect = this.canvasRef.current.getBoundingClientRect();
-    const topleft = { x: rect.width * 0.60, y: rect.height * 0.85 };
+    const topleft = { x: rect.width * 0.31, y: rect.height * 0.91 };
     const height = 25;
-    const width = 25;
+    const width = 50;
 
+    const p = this.genRect(topleft.x, topleft.y, height, width);
+    if (DEBUG) {
+      const ctx = this.canvasRef.current.getContext('2d');
+      ctx.rect(p[0].x, p[0].y, width, height);
+    }
     return {
       id: 'plus',
-      points: this.genRect(topleft.x, topleft.y, height, width),
+      points: p,
       height: height,
       width: width,
     };
@@ -155,13 +171,18 @@ export class CanvasComponent extends React.Component<Props, State> {
 
   private getMinusBitsRegion(): Region {
     const rect = this.canvasRef.current.getBoundingClientRect();
-    const topleft = { x: rect.width * 0.20, y: rect.height * 0.85 };
+    const topleft = { x: rect.width * 0.52, y: rect.height * 0.91 };
     const height = 25;
-    const width = 25;
+    const width = 50;
 
+    const p = this.genRect(topleft.x, topleft.y, height, width);
+    if (DEBUG) {
+      const ctx = this.canvasRef.current.getContext('2d');
+      ctx.rect(p[0].x, p[0].y, width, height);
+    }
     return {
       id: 'minus',
-      points: this.genRect(topleft.x, topleft.y, height, width),
+      points: p,
       height: height,
       width: width,
     };
@@ -185,21 +206,26 @@ export class CanvasComponent extends React.Component<Props, State> {
   }
 
   private assetsLoaded() {
+    const { slotImg } = this.state;
     this.canvasRef.current.addEventListener('mousemove', this.handleMouse.bind(this));
     this.canvasRef.current.addEventListener('click', this.clickHandler.bind(this));
-    this.canvasRef.current.width = this.state.slotImg.width;
-    this.canvasRef.current.height = this.state.slotImg.height;
+    this.canvasRef.current.width = 300;
+    this.canvasRef.current.height = 433;
     const ctx = this.canvasRef.current.getContext('2d');
-    ctx.drawImage(this.state.slotImg, 0, 0);
+    ctx.drawImage(slotImg, 0, 0, slotImg.width, slotImg.height,
+      0, 0, 300, 433);
   }
 
   public render() {
     let ctx: CanvasRenderingContext2D;
     if (this.canvasRef.current) {
       ctx = this.canvasRef.current.getContext('2d');
-      ctx.drawImage(this.state.slotImg, 0, 0);
-      ctx.font = '24px serif';
-      ctx.fillText('Bits: ' + this.state.currentBits.toString(), 50, 80);
+      ctx.clearRect(0, 0, this.canvasRef.current.width, this.canvasRef.current.height);
+      ctx.drawImage(this.state.slotImg, 0, 0, this.state.slotImg.width, this.state.slotImg.height,
+        0, 0, 300, 433);
+      ctx.font = '18px serif';
+      ctx.fillStyle = 'white';
+      ctx.fillText(this.state.currentBits.toString(), 227, 415);
     }
 
     if (this.props.lastScore) {
@@ -209,7 +235,7 @@ export class CanvasComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <canvas style={{ border: '1px solid black' }} ref={this.canvasRef} id='slotAnimation'></canvas>
+        <canvas ref={this.canvasRef} id='slotAnimation'></canvas>
       </>
     );
   }
