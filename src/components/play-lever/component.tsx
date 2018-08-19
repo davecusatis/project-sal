@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Session } from '../../core/models/session';
+import * as lever from '../../assets/img/lever.png';
 
 export interface ReduxStateProps {
   session: Session;

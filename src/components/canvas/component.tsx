@@ -1,9 +1,10 @@
 import * as React from 'react';
-import * as slot from '../../assets/img/slots.jpg';
 import * as machine from '../../assets/img/machine.png';
+import * as lever from '../../assets/img/leverPull2.png';
 import { Session } from '../../core/models/session';
+import { spinning } from '../../core/reducers/slot-machine';
 
-const DEBUG = true;
+const DEBUG = false;
 
 interface MousePosition {
   x: number;
@@ -22,9 +23,20 @@ interface Point {
   y: number;
 }
 
+interface LeverState {
+  frameIndex: number;
+  numberOfFrames: number;
+  tickCount: number;
+  ticksPerFrame: number;
+  width: number;
+  height: number;
+}
+
 interface State {
   slotImg: HTMLImageElement;
+  leverImg: HTMLImageElement;
   currentBits: number;
+  leverState: LeverState;
 }
 
 interface PublicProps { }
@@ -39,9 +51,22 @@ export interface ReduxDispatchProps {
   play: (jwt: string) => void;
 }
 
+const leverState = React.createContext({
+  frameIndex: 0,
+  numberOfFrames: 14,
+  tickCount: 0,
+  ticksPerFrame: 4,
+  width: 52,
+  height: 132,
+});
+
 type Props = PublicProps & ReduxDispatchProps & ReduxStateProps;
 export class CanvasComponent extends React.Component<Props, State> {
   private canvasRef: React.RefObject<HTMLCanvasElement>;
+
+  set leverState(ls: any) {
+    this.leverState = ls
+  }
 
   constructor(props: Props) {
     super(props);
@@ -53,10 +78,15 @@ export class CanvasComponent extends React.Component<Props, State> {
     let s = new Image();
     s.src = machine;
 
+    let l = new Image();
+    l.src = lever;
+
     s.addEventListener('load', this.assetsLoaded.bind(this));
     this.state = {
       slotImg: s,
+      leverImg: l,
       currentBits: 0,
+      leverState: this.leverState,
     };
   }
 
@@ -83,6 +113,7 @@ export class CanvasComponent extends React.Component<Props, State> {
       switch (region.id) {
         case 'handle':
           play(token);
+          this.animating = true;
           break;
 
         case 'plus':
@@ -216,16 +247,79 @@ export class CanvasComponent extends React.Component<Props, State> {
       0, 0, 300, 433);
   }
 
+  private renderSlotMachine(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, this.canvasRef.current.width, this.canvasRef.current.height);
+    ctx.drawImage(
+      this.state.slotImg,
+      0,
+      0,
+      this.state.slotImg.width,
+      this.state.slotImg.height,
+      0,
+      0,
+      300,
+      433);
+    ctx.font = '18px serif';
+    ctx.fillStyle = 'white';
+    ctx.fillText(this.state.currentBits.toString(), 227, 415);
+  }
+
+  private renderLever(ctx: CanvasRenderingContext2D) {
+    const rect = this.canvasRef.current.getBoundingClientRect();
+    const topleft = { x: rect.width * 0.81, y: rect.height * 0.5 }
+    const { leverImg } = this.state;
+    console.log('frame index ', leverState);
+    console.log('selection: ', leverState.width * leverState.frameIndex)
+    ctx.drawImage(
+      leverImg,
+      leverState.frameIndex * leverState.width,
+      0,
+      leverState.width,
+      leverState.height,
+      topleft.x,
+      topleft.y,
+      leverState.width,
+      leverState.height);
+  }
+
+  private updateLever() {
+    leverState.tickCount = leverState.tickCount + 1;
+    if (leverState.tickCount > leverState.ticksPerFrame) {
+      leverState.tickCount = 0;
+      if (leverState.frameIndex < leverState.numberOfFrames - 1) {
+        // Go to the next frame
+        leverState = {
+          ...leverState,
+          frameIndex: leverState.frameIndex + 1,
+        };
+      } else {
+        this.animating = false;
+        leverState = {
+          ...leverState,
+          frameIndex: 0,
+        };
+      }
+    }
+  }
+
+  private animateLever(ctx: CanvasRenderingContext2D): FrameRequestCallback {
+    return () => {
+      this.updateLever();
+      this.renderLever(ctx);
+    }
+  }
+
+  private animating = false;
   public render() {
     let ctx: CanvasRenderingContext2D;
     if (this.canvasRef.current) {
       ctx = this.canvasRef.current.getContext('2d');
-      ctx.clearRect(0, 0, this.canvasRef.current.width, this.canvasRef.current.height);
-      ctx.drawImage(this.state.slotImg, 0, 0, this.state.slotImg.width, this.state.slotImg.height,
-        0, 0, 300, 433);
-      ctx.font = '18px serif';
-      ctx.fillStyle = 'white';
-      ctx.fillText(this.state.currentBits.toString(), 227, 415);
+      if (this.animating) {
+        window.requestAnimationFrame(this.animateLever(ctx));
+      } else {
+      }
+      this.renderSlotMachine(ctx);
+      this.renderLever(ctx);
     }
 
     if (this.props.lastScore) {
