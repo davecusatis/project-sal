@@ -31,20 +31,26 @@ export class CanvasComponent extends React.Component<Props, State> {
     super(props);
 
     this.canvasRef = React.createRef();
-
-    let s = new Image();
-    s.src = machine;
-
-    let l = new Image();
-    l.src = lever;
-
-    s.addEventListener('load', this.assetsLoaded.bind(this));
     this.state = {
-      slotImg: s,
-      leverImg: l,
+      slotImg: new Image(),
+      leverImg: new Image(),
       currentBits: 0,
       gfx: null,
     };
+  }
+
+  private loadSlots(): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      this.state.slotImg.src = machine;
+      this.state.slotImg.onload = () => resolve(this.state.slotImg);
+    });
+  }
+
+  private loadLever(): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      this.state.leverImg.src = lever;
+      this.state.leverImg.onload = () => resolve(this.state.leverImg);
+    });
   }
 
   private assetsLoaded() {
@@ -66,6 +72,12 @@ export class CanvasComponent extends React.Component<Props, State> {
       ctx.font = '48px serif';
       ctx.fillText(this.props.lastScore.toString(), 50, 50);
     }
+
+    Promise.all([
+      this.loadLever(),
+      this.loadSlots(),
+    ]).then(() => this.assetsLoaded());
+
     return (
       <>
         <canvas ref={this.canvasRef} id='slotAnimation'></canvas>
