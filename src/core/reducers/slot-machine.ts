@@ -1,9 +1,10 @@
 import * as slotMachineActions from '../actions/slot-machine';
 import { GlobalState } from '../models/global-state';
+import { Score } from '../models/slot-machine';
 
 export interface SlotMachineState {
   spinning: boolean;
-  lastScore?: number;
+  lastScore?: Score;
 }
 
 export const getInitialState = (): SlotMachineState => ({
@@ -28,7 +29,7 @@ export function slotMachineReducer(state = getInitialState(), action: slotMachin
   }
 }
 
-export function getLastScore(state: GlobalState): number {
+export function getLastScore(state: GlobalState): Score {
   return state.slotMachine && state.slotMachine.lastScore;
 }
 

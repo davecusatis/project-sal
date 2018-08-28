@@ -1,4 +1,4 @@
-const prod = true;
+const prod = false;
 
 export class API {
   private apiRoot = prod ? 'https://project-sal.dotstarmoney.com/' : 'http://localhost:3030/';
@@ -13,7 +13,7 @@ export class API {
   }
 
   public play(jwt: string): Promise<Response> {
-    return fetch(this.apiRoot + 'api/v0/play', {
+    return fetch(this.apiRoot + 'api/v0/scores', {
       method: 'POST',
       headers: {
         'authorization': 'Bearer ' + jwt,

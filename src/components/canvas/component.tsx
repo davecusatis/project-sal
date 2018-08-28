@@ -3,6 +3,7 @@ import * as machine from '../../assets/img/machine.png';
 import * as lever from '../../assets/img/leverPull.png';
 import { Session } from '../../core/models/session';
 import { GFX } from '../../lib/gfx/gfx';
+import { Score } from '../../core/models/slot-machine';
 
 
 interface State {
@@ -17,7 +18,7 @@ interface PublicProps { }
 export interface ReduxStateProps {
   session: Session;
   spinning: boolean;
-  lastScore: number;
+  lastScore: Score;
 }
 
 export interface ReduxDispatchProps {
@@ -55,27 +56,27 @@ export class CanvasComponent extends React.Component<Props, State> {
 
   private assetsLoaded() {
     let { slotImg, leverImg, gfx } = this.state;
-    gfx = new GFX(
-      slotImg,
-      leverImg),
-
-      this.canvasRef.current.width = 300;
-    this.canvasRef.current.height = 433;
-
-    gfx.setCanvasRef(this.canvasRef.current);
-    gfx.render();
+    if (!gfx) {
+      gfx = new GFX(slotImg, leverImg);
+      gfx.setCanvasRef(this.canvasRef.current);
+      gfx.setCallbackForRegion('handle', () => { this.props.play(this.props.session.token) });
+      gfx.render();
+    }
   }
 
   public render() {
-    if (this.props.lastScore) {
-      let ctx: CanvasRenderingContext2D;
-      ctx.font = '48px serif';
-      ctx.fillText(this.props.lastScore.toString(), 50, 50);
+    if (!this.props.session) {
+      return null;
     }
-
     Promise.all([
       this.loadLever(),
       this.loadSlots(),
+      () => {
+        if (this.props.lastScore) {
+          const { gfx } = this.state;
+          gfx.renderText(this.props.lastScore.toString(), 50, 50);
+        }
+      }
     ]).then(() => this.assetsLoaded());
 
     return (

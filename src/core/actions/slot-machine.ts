@@ -1,5 +1,6 @@
 import { Action } from '../models/actions';
 import { API } from '../api';
+import { Score } from '../models/slot-machine';
 
 const api = new API();
 
@@ -11,7 +12,7 @@ interface errAction extends Action<typeof ERROR> { }
 
 export const SCORE_RECEIVED = 'core.slot-machine.SCORE_RECEIVED';
 interface scoreReceivedAction extends Action<typeof SCORE_RECEIVED> {
-  score: number;
+  score: Score;
 }
 
 export type All = (
@@ -26,7 +27,7 @@ export function play(jwt: string): playAction {
   };
 }
 
-export function scoreUpdated(newScore: number): scoreReceivedAction {
+export function scoreUpdated(newScore: Score): scoreReceivedAction {
   return {
     type: SCORE_RECEIVED,
     score: newScore,

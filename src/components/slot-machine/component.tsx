@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Canvas } from '../canvas';
+import { Score } from '../../core/models/slot-machine';
 
 export interface PublicProps {
 }
 
 export interface ReduxStateProps {
   spinning: boolean;
-  lastScore?: number;
+  lastScore?: Score;
 }
 
 type Props = PublicProps & ReduxStateProps;
@@ -24,7 +25,7 @@ export class SlotMachineComponent extends React.Component<Props> {
         <Canvas />
         <br />
         {spinning && this.renderSpinning()}
-        Score: {lastScore}
+        Score: {lastScore && lastScore.score}
       </div>
     );
   }

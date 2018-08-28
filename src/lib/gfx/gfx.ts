@@ -1,5 +1,4 @@
-import * as React from 'react';
-const DEBUG = false;
+const DEBUG = true;
 
 interface MousePosition {
   x: number;
@@ -40,6 +39,7 @@ export class GFX {
   private ctx: CanvasRenderingContext2D;
   private slotImg: HTMLImageElement;
   private leverImg: HTMLImageElement;
+  private callbackMap: { [key: string]: Function };
 
   constructor(slot: HTMLImageElement, lever: HTMLImageElement) {
     this.slotImg = slot;
@@ -53,14 +53,18 @@ export class GFX {
       width: 52,
       height: 132,
     }
+    this.callbackMap = {}
   }
 
   public setCanvasRef(c: HTMLCanvasElement) {
+    // TODO: make these more dynamic, based on extension context
+    c.width = 300;
+    c.height = 433;
     this.canvas = c;
     this.ctx = c.getContext('2d');
 
     this.canvas.addEventListener('mousemove', this.handleMouse.bind(this));
-    this.canvas.addEventListener('click', this.clickHandler.bind(this));
+    this.canvas.addEventListener('mousedown', this.clickHandler.bind(this));
 
   }
 
@@ -72,7 +76,14 @@ export class GFX {
     return { x: mouseX, y: mouseY };
   }
 
+  public setCallbackForRegion(region: string, callback: Function) {
+    this.callbackMap[region] = callback;
+  }
+
   public clickHandler(event: MouseEvent) {
+    if (this.animationState.animating) {
+      return;
+    }
     const { x, y } = this.getMouse(event);
     const region = this.isInPath(x, y);
     // const { currentBits: bits } = this.state;
@@ -82,7 +93,7 @@ export class GFX {
         case 'handle':
           // this.play(this.token);
           console.log('handle click');
-          this.ctx.fillText('handle clicked', 227, 415);
+          this.callbackMap['handle']();
           this.animationState.animating = true;
           window.requestAnimationFrame(() => this.animationLoop());
           break;
@@ -260,9 +271,12 @@ export class GFX {
   }
 
   public render() {
-
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.renderSlotMachine();
     this.renderLever();
+  }
+
+  public renderText(text: string, x: number, y: number) {
+    this.ctx.fillText(text, x, y);
   }
 }
