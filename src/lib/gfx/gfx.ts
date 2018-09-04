@@ -1,4 +1,4 @@
-const DEBUG = true;
+const DEBUG = false;
 
 interface MousePosition {
   x: number;
@@ -17,21 +17,21 @@ interface Point {
   y: number;
 }
 
-interface LeverState {
+interface GenericAnimationState {
   frameIndex: number;
   numberOfFrames: number;
   tickCount: number;
   ticksPerFrame: number;
   width: number;
   height: number;
-}
-
-interface CommonAnimationState {
-  animationID?: number;
   animating: boolean;
 }
 
-type AnimationState = CommonAnimationState & LeverState;
+interface AnimationState {
+  animationID?: number;
+  lever: GenericAnimationState;
+  icons: GenericAnimationState;
+}
 
 export class GFX {
   private animationState: AnimationState;
@@ -39,21 +39,36 @@ export class GFX {
   private ctx: CanvasRenderingContext2D;
   private slotImg: HTMLImageElement;
   private leverImg: HTMLImageElement;
+  private iconsImg: HTMLImageElement;
   private callbackMap: { [key: string]: Function };
+  private doneAnimating: () => void;
 
-  constructor(slot: HTMLImageElement, lever: HTMLImageElement) {
+  constructor(slot: HTMLImageElement, lever: HTMLImageElement, icons: HTMLImageElement, doneAnimating: () => void) {
     this.slotImg = slot;
     this.leverImg = lever;
+    this.iconsImg = icons;
     this.animationState = {
-      animating: false,
-      frameIndex: 0,
-      numberOfFrames: 33,
-      tickCount: 0,
-      ticksPerFrame: 1,
-      width: 52,
-      height: 132,
+      lever: {
+        frameIndex: 0,
+        numberOfFrames: 33,
+        tickCount: 0,
+        ticksPerFrame: 1,
+        width: 52,
+        height: 132,
+        animating: false,
+      },
+      icons: {
+        frameIndex: 0,
+        numberOfFrames: 120,
+        tickCount: 0,
+        ticksPerFrame: 0,
+        width: 128,
+        height: 9 * 128,
+        animating: false,
+      }
     }
     this.callbackMap = {}
+    this.doneAnimating = doneAnimating;
   }
 
   public setCanvasRef(c: HTMLCanvasElement) {
@@ -81,40 +96,17 @@ export class GFX {
   }
 
   public clickHandler(event: MouseEvent) {
-    if (this.animationState.animating) {
+    if (this.animationState.lever.animating) {
       return;
     }
     const { x, y } = this.getMouse(event);
     const region = this.isInPath(x, y);
-    // const { currentBits: bits } = this.state;
-
-    if (region) {
-      switch (region.id) {
-        case 'handle':
-          // this.play(this.token);
-          console.log('handle click');
-          this.callbackMap['handle']();
-          this.animationState.animating = true;
-          window.requestAnimationFrame(() => this.animationLoop());
-          break;
-
-        case 'plus':
-          console.log('increase bits');
-          //   if (bits < 10000) {
-          //     // this.setState({
-          //     //   currentBits: bits + 100,
-          //     // });
-          //   }
-          break;
-
-        case 'minus':
-          console.log('decrease bits');
-          // if (bits > 0) {
-          // this.setState({
-          //   currentBits: bits - 100,
-          // });
-          // }
-          break;
+    if (region && region.id) {
+      this.callbackMap[region.id]();
+      if (region.id === 'handle') {
+        this.animationState.lever.animating = true;
+        this.animationState.icons.animating = true;
+        this.animationLoop();
       }
     }
   }
@@ -122,13 +114,14 @@ export class GFX {
   public handleMouse(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
-
-    const { x, y } = this.getMouse(event);
-    const region = this.isInPath(x, y);
-    if (region) {
-      this.canvas.style.cursor = 'pointer';
-    } else {
-      this.canvas.style.cursor = 'default';
+    if (!this.animationState.icons.animating) {
+      const { x, y } = this.getMouse(event);
+      const region = this.isInPath(x, y);
+      if (region) {
+        this.canvas.style.cursor = 'pointer';
+      } else {
+        this.canvas.style.cursor = 'default';
+      }
     }
   }
 
@@ -219,7 +212,6 @@ export class GFX {
   }
 
   private renderSlotMachine() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.drawImage(
       this.slotImg,
       0,
@@ -230,8 +222,6 @@ export class GFX {
       0,
       300,
       433);
-    this.ctx.font = '18px serif';
-    this.ctx.fillStyle = 'white';
   }
 
   private renderLever() {
@@ -239,25 +229,45 @@ export class GFX {
     const topleft = { x: rect.width * 0.81, y: rect.height * 0.5 }
     this.ctx.drawImage(
       this.leverImg,
-      this.animationState.frameIndex * this.animationState.width,
+      this.animationState.lever.frameIndex * this.animationState.lever.width,
       0,
-      this.animationState.width,
-      this.animationState.height,
+      this.animationState.lever.width,
+      this.animationState.lever.height,
       topleft.x,
       topleft.y,
-      this.animationState.width,
-      this.animationState.height);
+      this.animationState.lever.width,
+      this.animationState.lever.height);
   }
 
   private updateAnimation() {
-    this.animationState.tickCount = this.animationState.tickCount + 1;
-    if (this.animationState.tickCount > this.animationState.ticksPerFrame) {
-      this.animationState.tickCount = 0;
-      if (this.animationState.frameIndex < this.animationState.numberOfFrames - 1) {
-        this.animationState.frameIndex += 1;
+    if (this.animationState.lever.animating) {
+      this.updateLeverAnimation();
+    }
+    this.updateIconsAnimation();
+  }
+
+  private updateLeverAnimation() {
+    this.animationState.lever.tickCount = this.animationState.lever.tickCount + 1;
+    if (this.animationState.lever.tickCount > this.animationState.lever.ticksPerFrame) {
+      this.animationState.lever.tickCount = 0;
+      if (this.animationState.lever.frameIndex < this.animationState.lever.numberOfFrames - 1) {
+        this.animationState.lever.frameIndex += 1;
       } else {
-        this.animationState.animating = false;
-        this.animationState.frameIndex = 0;
+        this.animationState.lever.frameIndex = 0;
+        this.animationState.lever.animating = false;
+      }
+    }
+  }
+
+  private updateIconsAnimation() {
+    this.animationState.icons.tickCount = this.animationState.icons.tickCount + 1;
+    if (this.animationState.icons.tickCount > this.animationState.icons.ticksPerFrame) {
+      this.animationState.icons.tickCount = 0;
+      if (this.animationState.icons.frameIndex < this.animationState.icons.numberOfFrames - 1) {
+        this.animationState.icons.frameIndex += 1;
+      } else {
+        this.animationState.icons.frameIndex = 0;
+        this.animationState.icons.animating = false;
         cancelAnimationFrame(this.animationState.animationID);
       }
     }
@@ -266,17 +276,60 @@ export class GFX {
   private animationLoop() {
     this.animationState.animationID = window.requestAnimationFrame(() => this.animationLoop());
     this.updateAnimation();
-    this.renderSlotMachine();
-    this.renderLever();
+    this.render();
+    if (!this.animationState.icons.animating) {
+      this.doneAnimating();
+    }
+  }
+
+  public renderBits(bits: number) {
+    const rect = this.canvas.getBoundingClientRect();
+    const topleft = { x: rect.width * 0.745, y: rect.height * 0.955 };
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '20px serif';
+    this.renderText(bits.toString(), topleft.x, topleft.y);
+  }
+
+  public renderScore(score: string) {
+    const rect = this.canvas.getBoundingClientRect();
+    const topleft = { x: rect.width * 0.35, y: rect.height * 0.33 };
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '48px serif';
+    this.renderText(score, topleft.x, topleft.y);
+  }
+
+  public renderIcons() {
+    const rect = this.canvas.getBoundingClientRect();
+    const toplefts = [
+      { x: rect.width * 0.22, y: rect.height * 0.55 },
+      { x: rect.width * 0.42, y: rect.height * 0.55 },
+      { x: rect.width * 0.62, y: rect.height * 0.55 },
+    ];
+    const updateHeight = this.animationState.icons.frameIndex * 19.2;
+
+    toplefts.forEach(topleft => {
+      this.ctx.drawImage(
+        this.iconsImg,
+        0,
+        updateHeight,
+        this.animationState.icons.width,
+        this.animationState.icons.height,
+        topleft.x,
+        topleft.y,
+        this.animationState.icons.width * 0.35,
+        this.animationState.icons.height * 0.35);
+    });
   }
 
   public render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.renderIcons();
     this.renderSlotMachine();
     this.renderLever();
   }
 
-  public renderText(text: string, x: number, y: number) {
+  private renderText(text: string, x: number, y: number) {
     this.ctx.fillText(text, x, y);
   }
 }

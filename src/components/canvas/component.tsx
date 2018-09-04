@@ -1,31 +1,26 @@
 import * as React from 'react';
 import * as machine from '../../assets/img/machine.png';
 import * as lever from '../../assets/img/leverPull.png';
+import * as icons from '../../assets/img/icons.png';
 import { Session } from '../../core/models/session';
-import { GFX } from '../../lib/gfx/gfx';
-import { Score } from '../../core/models/slot-machine';
-
+import { SlotsState } from '../../lib/slots/slots';
+import { app } from '../../core/app';
 
 interface State {
   slotImg: HTMLImageElement;
   leverImg: HTMLImageElement;
+  iconsImg: HTMLImageElement;
   currentBits: number;
-  gfx: GFX;
+  slots: SlotsState;
 }
 
 interface PublicProps { }
 
 export interface ReduxStateProps {
   session: Session;
-  spinning: boolean;
-  lastScore: Score;
 }
 
-export interface ReduxDispatchProps {
-  play: (jwt: string) => void;
-}
-
-type Props = PublicProps & ReduxDispatchProps & ReduxStateProps;
+type Props = PublicProps & ReduxStateProps;
 export class CanvasComponent extends React.Component<Props, State> {
   private canvasRef: React.RefObject<HTMLCanvasElement>;
   constructor(props: Props) {
@@ -35,33 +30,42 @@ export class CanvasComponent extends React.Component<Props, State> {
     this.state = {
       slotImg: new Image(),
       leverImg: new Image(),
+      iconsImg: new Image(),
       currentBits: 0,
-      gfx: null,
+      slots: null,
     };
   }
 
   private loadSlots(): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.state.slotImg.src = machine;
       this.state.slotImg.onload = () => resolve(this.state.slotImg);
     });
   }
 
   private loadLever(): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.state.leverImg.src = lever;
       this.state.leverImg.onload = () => resolve(this.state.leverImg);
     });
   }
 
-  private assetsLoaded() {
-    let { slotImg, leverImg, gfx } = this.state;
-    if (!gfx) {
-      gfx = new GFX(slotImg, leverImg);
-      gfx.setCanvasRef(this.canvasRef.current);
-      gfx.setCallbackForRegion('handle', () => { this.props.play(this.props.session.token) });
-      gfx.render();
-    }
+  private loadIcons(): Promise<HTMLImageElement> {
+    return new Promise((resolve) => {
+      this.state.iconsImg.src = icons;
+      this.state.iconsImg.onload = () => resolve(this.state.iconsImg);
+    });
+  }
+
+  private load() {
+    let { slots } = this.state;
+    slots = new SlotsState(app.store);
+    slots.loadSlots(
+      this.state.slotImg,
+      this.state.leverImg,
+      this.state.iconsImg,
+      this.canvasRef.current,
+    )
   }
 
   public render() {
@@ -71,13 +75,8 @@ export class CanvasComponent extends React.Component<Props, State> {
     Promise.all([
       this.loadLever(),
       this.loadSlots(),
-      () => {
-        if (this.props.lastScore) {
-          const { gfx } = this.state;
-          gfx.renderText(this.props.lastScore.toString(), 50, 50);
-        }
-      }
-    ]).then(() => this.assetsLoaded());
+      this.loadIcons(),
+    ]).then(() => this.load());
 
     return (
       <>

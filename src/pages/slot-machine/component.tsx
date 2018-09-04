@@ -2,7 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { Context } from '../../core/models/context';
 import { Session } from '../../core/models/session';
-import { SlotMachine } from '../../components/slot-machine';
+import { Canvas } from '../../components/canvas';
 interface State {
 }
 export interface PublicProps { }
@@ -17,7 +17,7 @@ export class SlotMachinePageComponent extends React.Component<Props, State> {
   public render() {
     return (
       <div>
-        <SlotMachine />
+        <Canvas />
       </div>
     );
   }

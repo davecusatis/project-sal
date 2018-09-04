@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 import { Session } from './models/session';
 import * as sessionActions from './actions/session';
 import * as contextActions from './actions/context';
-import * as slotMachineActions from './actions/slot-machine';
 export let app: App;
 export let config: typeof app.config;
 export let store: typeof app.store;
@@ -44,18 +43,6 @@ export class App {
 
     window.Twitch.ext.onError((error: string | Error) => {
       console.log(error);
-    });
-
-    window.Twitch.ext.listen('broadcast', (target: any, contentType: any, message: any) => {
-      message = JSON.parse(message);
-      switch (message.type) {
-        case 'scoreUpdated':
-
-          this.store.dispatch(slotMachineActions.scoreUpdated(message.data.score));
-          break;
-        default:
-          break;
-      }
     });
   }
 
