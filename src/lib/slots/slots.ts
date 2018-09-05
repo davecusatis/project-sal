@@ -68,7 +68,7 @@ export class SlotsState {
     this.updateGFX();
   }
 
-  public loadSlots(slotImg: HTMLImageElement, leverImg: HTMLImageElement, iconsImg: HTMLImageElement, canvas: HTMLCanvasElement) {
+  public loadSlots(slotImg: HTMLImageElement, leverImg: HTMLImageElement, iconsImg: HTMLImageElement[], canvas: HTMLCanvasElement) {
     this.gfx = new GFX(
       slotImg,
       leverImg,
