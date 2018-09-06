@@ -68,7 +68,7 @@ export class GFX {
       icons: {
         toplefts: [],
         frameIndex: 0,
-        numberOfFrames: 150,
+        numberOfFrames: 180,
         tickCount: 0,
         ticksPerFrame: 0,
         width: 128,
@@ -287,16 +287,19 @@ export class GFX {
     const rect = this.canvas.getBoundingClientRect();
     const bottom = rect.height * this.ICON_BOTTOM;
     const top = rect.height * this.ICON_TOP;
-    let y = top - ((this.pos) % 128 + 128);
-    let imgIndex = Math.floor(this.pos / 128) % 9;
-    // imgIndex += 9 * Math.floor((1 + imgIndex / 9));
-    console.log("img index" + imgIndex);
-    while (y * this.ICON_BOTTOM < bottom) {
+
+    const n = 9;
+    const pos = this.pos % (128 * n);
+    let y = top - ((pos) % 128 + 128);
+    let imgIndex = Math.floor(pos / 128);
+    // imgIndex += n * Math.floor((1 + imgIndex / n));
+    // console.log("img index" + imgIndex);
+    while (y * this.ICON_BOTTOM - 60 <= bottom) {
       this.animationState.icons.toplefts[imgIndex].y = y;
-      y += 128 * 0.35;
-      const next = (imgIndex + 1) % 9;
-      console.log(next);
-      imgIndex = next// > 9 ? 0 : next;
+      y += 60;
+      const next = (imgIndex + 1) % n;
+      // console.log(next);
+      imgIndex = next// > n ? 0 : next;
     }
 
     // const rect = this.canvas.getBoundingClientRect();
@@ -325,7 +328,7 @@ export class GFX {
       this.animationState.icons.tickCount = 0;
       if (this.animationState.icons.frameIndex < this.animationState.icons.numberOfFrames - 1) {
         this.animationState.icons.frameIndex += 1;
-        this.pos += 1;
+        this.pos += 15;
         this.updateToplefts();
       } else {
         this.animationState.icons.frameIndex = 0;
@@ -385,7 +388,7 @@ export class GFX {
   }
 
   public renderIcons(toplefts: Point[]) {
-    // const rect = this.canvas.getBoundingClientRect();
+    const rect = this.canvas.getBoundingClientRect();
     // const toplefts = [
     //   { x: rect.width * 0.22, y: rect.height * 0.55 },
     //   { x: rect.width * 0.42, y: rect.height * 0.55 },
@@ -407,26 +410,60 @@ export class GFX {
     // });
     // this.drawStops(pos);
 
+    const bottom = rect.height * this.ICON_BOTTOM + 60;
+    const top = rect.height * this.ICON_TOP;
     toplefts.forEach((topleft, index, arr) => {
-      this.ctx.drawImage(
-        this.icons[index],
-        0,
-        0,
-        this.animationState.icons.width,
-        this.animationState.icons.height,
-        arr[index].x,
-        arr[index].y,
-        this.animationState.icons.width * 0.35,
-        this.animationState.icons.height * 0.35);
+      if (arr[index].y > top - 60 && arr[index].y < bottom) {
+        this.ctx.drawImage(
+          this.icons[index],
+          0,
+          0,
+          this.animationState.icons.width,
+          this.animationState.icons.height,
+          arr[index].x,
+          arr[index].y,
+          this.animationState.icons.width * 0.35,
+          this.animationState.icons.height * 0.35);
+      }
+    });
+
+    toplefts.forEach((topleft, index, arr) => {
+      if (arr[index].y > top - 60 && arr[index].y < bottom) {
+        this.ctx.drawImage(
+          this.icons[index],
+          0,
+          0,
+          this.animationState.icons.width,
+          this.animationState.icons.height,
+          rect.width * 0.42,
+          arr[index].y,
+          this.animationState.icons.width * 0.35,
+          this.animationState.icons.height * 0.35);
+      }
+    });
+
+    toplefts.forEach((topleft, index, arr) => {
+      if (arr[index].y > top - 60 && arr[index].y < bottom) {
+        this.ctx.drawImage(
+          this.icons[index],
+          0,
+          0,
+          this.animationState.icons.width,
+          this.animationState.icons.height,
+          rect.width * 0.62,
+          arr[index].y,
+          this.animationState.icons.width * 0.35,
+          this.animationState.icons.height * 0.35);
+      }
     });
   }
 
   public render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    this.renderIcons(this.animationState.icons.toplefts);
     this.renderSlotMachine();
     this.renderLever();
-    this.renderIcons(this.animationState.icons.toplefts);
   }
 
   private renderText(text: string, x: number, y: number) {
