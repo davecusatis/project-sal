@@ -8,6 +8,8 @@ import * as coin from '../../assets/img/iconCoin.png';
 import * as horseshoe from '../../assets/img/iconHorseshoe.png';
 import * as lime from '../../assets/img/iconLime.png';
 import * as plum from '../../assets/img/iconPlum.png';
+import * as lightDot from '../../assets/img/lightDot.png';
+import * as lightBulb from '../../assets/img/lightBulb.png';
 import * as seven from '../../assets/img/iconSeven.png';
 import * as diamond from '../../assets/img/iconDiamond.png';
 import { Session } from '../../core/models/session';
@@ -18,6 +20,8 @@ interface State {
   slotImg: HTMLImageElement;
   leverImg: HTMLImageElement;
   iconsImg: HTMLImageElement[];
+  lightBulb: HTMLImageElement;
+  lightDot: HTMLImageElement;
   currentBits: number;
   slots: SlotsState;
 }
@@ -38,6 +42,8 @@ export class CanvasComponent extends React.Component<Props, State> {
     this.state = {
       slotImg: new Image(),
       leverImg: new Image(),
+      lightDot: new Image(),
+      lightBulb: new Image(),
       iconsImg: [
         new Image(),
         new Image(),
@@ -52,6 +58,18 @@ export class CanvasComponent extends React.Component<Props, State> {
       currentBits: 0,
       slots: null,
     };
+  }
+
+  private loadLights(): Promise<HTMLImageElement>[] {
+    return [
+      new Promise((resolve) => {
+        this.state.lightDot.src = lightDot;
+        this.state.lightDot.onload = () => resolve(this.state.lightDot);
+      }),
+      new Promise((resolve) => {
+        this.state.lightBulb.src = lightBulb;
+        this.state.lightBulb.onload = () => resolve(this.state.lightBulb);
+      })];
   }
 
   private loadSlots(): Promise<HTMLImageElement> {
@@ -70,19 +88,11 @@ export class CanvasComponent extends React.Component<Props, State> {
 
   private loadIcons(): Promise<HTMLImageElement>[] {
     return [bar, bell, cherries, coin, horseshoe, lime, plum, seven, diamond].map((img, index) => {
-      console.log('loaded ', img.name)
       return new Promise((resolve) => {
         this.state.iconsImg[index].src = img;
         this.state.iconsImg[index].onload = () => resolve(this.state.iconsImg[index]);
       });
     });
-    // Promise.all(promises).then((resolve) => {
-    //   resolve(this.state.iconsImg);
-    // });
-    // return new Promise((resolve) => {
-    //   this.state.iconsImg.src = icons;
-    //   this.state.iconsImg.onload = () => resolve(this.state.iconsImg);
-    // });
   }
 
   private load() {
@@ -92,6 +102,8 @@ export class CanvasComponent extends React.Component<Props, State> {
       this.state.slotImg,
       this.state.leverImg,
       this.state.iconsImg,
+      this.state.lightDot,
+      this.state.lightBulb,
       this.canvasRef.current,
     )
   }
@@ -104,6 +116,7 @@ export class CanvasComponent extends React.Component<Props, State> {
       this.loadLever(),
       this.loadSlots(),
       ...this.loadIcons(),
+      ...this.loadLights(),
     ]).then(() => this.load());
 
     return (

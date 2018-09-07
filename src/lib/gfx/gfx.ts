@@ -48,13 +48,24 @@ export class GFX {
   private slotImg: HTMLImageElement;
   private leverImg: HTMLImageElement;
   private icons: HTMLImageElement[];
+  private lightDot: HTMLImageElement;
+  private lightBulb: HTMLImageElement;
   private callbackMap: { [key: string]: Function };
   private doneAnimating: () => void;
 
-  constructor(slot: HTMLImageElement, lever: HTMLImageElement, icons: HTMLImageElement[], doneAnimating: () => void) {
+  constructor(
+    slot: HTMLImageElement,
+    lever: HTMLImageElement,
+    icons: HTMLImageElement[],
+    lightDot: HTMLImageElement,
+    lightBulb: HTMLImageElement,
+    doneAnimating: () => void
+  ) {
     this.slotImg = slot;
     this.leverImg = lever;
     this.icons = icons;
+    this.lightDot = lightDot;
+    this.lightBulb = lightBulb;
     this.animationState = {
       lever: {
         frameIndex: 0,
@@ -262,6 +273,176 @@ export class GFX {
       this.animationState.lever.height);
   }
 
+  private renderLights() {
+    const rect = this.canvas.getBoundingClientRect();
+    const bulbToplefts = [
+      // left side bulbs
+      { x: -13, y: rect.height * 0.113 },
+      { x: -12, y: rect.height * 0.17 },
+      { x: -11, y: rect.height * 0.2275 },
+      { x: -10, y: rect.height * 0.2835 },
+      { x: -8, y: rect.height * 0.341 },
+      { x: -7, y: rect.height * 0.3975 },
+      { x: -6, y: rect.height * 0.455 },
+
+      // // right side bulbs
+      { x: rect.width * 0.9, y: rect.height * 0.113 },
+      { x: rect.width * 0.9, y: rect.height * 0.17 },
+      { x: rect.width * 0.895, y: rect.height * 0.2275 },
+      { x: rect.width * 0.89, y: rect.height * 0.2835 },
+      { x: rect.width * 0.8875, y: rect.height * 0.341 },
+      { x: rect.width * 0.88, y: rect.height * 0.3975 },
+      { x: rect.width * 0.875, y: rect.height * 0.455 },
+    ];
+
+    const dotToplefts = [
+      // top row dots
+      { x: rect.width * 0.07, y: rect.height * 0.135 },
+      { x: rect.width * 0.11, y: rect.height * 0.135 },
+      { x: rect.width * 0.15, y: rect.height * 0.135 },
+      { x: rect.width * 0.19, y: rect.height * 0.135 },
+      { x: rect.width * 0.23, y: rect.height * 0.135 },
+      { x: rect.width * 0.27, y: rect.height * 0.135 },
+      { x: rect.width * 0.31, y: rect.height * 0.135 },
+      { x: rect.width * 0.35, y: rect.height * 0.135 },
+      { x: rect.width * 0.39, y: rect.height * 0.135 },
+      { x: rect.width * 0.43, y: rect.height * 0.135 },
+      { x: rect.width * 0.47, y: rect.height * 0.135 },
+      { x: rect.width * 0.51, y: rect.height * 0.135 },
+      { x: rect.width * 0.55, y: rect.height * 0.135 },
+      { x: rect.width * 0.59, y: rect.height * 0.135 },
+      { x: rect.width * 0.63, y: rect.height * 0.135 },
+      { x: rect.width * 0.67, y: rect.height * 0.135 },
+      { x: rect.width * 0.71, y: rect.height * 0.135 },
+      { x: rect.width * 0.75, y: rect.height * 0.135 },
+      { x: rect.width * 0.79, y: rect.height * 0.135 },
+      { x: rect.width * 0.83, y: rect.height * 0.135 },
+      { x: rect.width * 0.87, y: rect.height * 0.135 },
+      { x: rect.width * 0.91, y: rect.height * 0.135 },
+
+
+      // bottom row dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+      { x: rect.width * 0.10, y: rect.height * 0.515 },
+      { x: rect.width * 0.145, y: rect.height * 0.515 },
+      { x: rect.width * 0.19, y: rect.height * 0.515 },
+      { x: rect.width * 0.23, y: rect.height * 0.515 },
+      { x: rect.width * 0.27, y: rect.height * 0.515 },
+      { x: rect.width * 0.31, y: rect.height * 0.515 },
+      { x: rect.width * 0.35, y: rect.height * 0.515 },
+      { x: rect.width * 0.39, y: rect.height * 0.515 },
+      { x: rect.width * 0.43, y: rect.height * 0.515 },
+      { x: rect.width * 0.47, y: rect.height * 0.515 },
+      { x: rect.width * 0.51, y: rect.height * 0.515 },
+      { x: rect.width * 0.55, y: rect.height * 0.515 },
+      { x: rect.width * 0.59, y: rect.height * 0.515 },
+      { x: rect.width * 0.63, y: rect.height * 0.515 },
+      { x: rect.width * 0.67, y: rect.height * 0.515 },
+      { x: rect.width * 0.71, y: rect.height * 0.515 },
+      { x: rect.width * 0.75, y: rect.height * 0.515 },
+      { x: rect.width * 0.79, y: rect.height * 0.515 },
+      { x: rect.width * 0.83, y: rect.height * 0.515 },
+      { x: rect.width * 0.87, y: rect.height * 0.515 },
+      { x: rect.width * 0.91, y: rect.height * 0.515 },
+
+      // right side dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+      { x: rect.width * 0.07, y: rect.height * 0.17 },
+      { x: rect.width * 0.071, y: rect.height * 0.2 },
+      { x: rect.width * 0.072, y: rect.height * 0.23 },
+      { x: rect.width * 0.073, y: rect.height * 0.26 },
+      { x: rect.width * 0.075, y: rect.height * 0.2975 },
+      { x: rect.width * 0.0775, y: rect.height * 0.325 },
+      { x: rect.width * 0.08, y: rect.height * 0.3575 },
+      { x: rect.width * 0.085, y: rect.height * 0.3875 },
+      { x: rect.width * 0.0875, y: rect.height * 0.42 },
+      { x: rect.width * 0.09, y: rect.height * 0.455 },
+      { x: rect.width * 0.0925, y: rect.height * 0.485 },
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+
+      // left side dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+      { x: rect.width * 0.9, y: rect.height * 0.17 },
+      { x: rect.width * 0.897, y: rect.height * 0.2 },
+      { x: rect.width * 0.895, y: rect.height * 0.23 },
+      { x: rect.width * 0.894, y: rect.height * 0.26 },
+      { x: rect.width * 0.891, y: rect.height * 0.2975 },
+      { x: rect.width * 0.8875, y: rect.height * 0.325 },
+      { x: rect.width * 0.887, y: rect.height * 0.3575 },
+      { x: rect.width * 0.886, y: rect.height * 0.3875 },
+      { x: rect.width * 0.8875, y: rect.height * 0.42 },
+      { x: rect.width * 0.883, y: rect.height * 0.455 },
+      { x: rect.width * 0.8825, y: rect.height * 0.485 },
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+    ];
+
+    // dotToplefts.forEach((topleft, index) => {
+    //   this.ctx.drawImage(
+    //     this.lightDot,
+    //     0,
+    //     0,
+    //     this.lightBulb.width,
+    //     this.lightBulb.height,
+    //     topleft.x,
+    //     topleft.y,
+    //     this.lightBulb.width * 0.6,
+    //     this.lightBulb.height * 0.6,
+    //   );
+    // });
+    // bulbToplefts.forEach((topleft, index) => {
+    //   if (index >= 0 && index < 7) {
+    //     this.ctx.drawImage(
+    //       this.lightBulb,
+    //       0,
+    //       0,
+    //       this.lightBulb.width,
+    //       this.lightBulb.height,
+    //       topleft.x,
+    //       topleft.y,
+    //       this.lightBulb.width * 0.6,
+    //       this.lightBulb.height * 0.6,
+    //     );
+    //   } else if (index >= 7 && index < 15) {
+    //     this.ctx.scale(-1, 1);
+    //     this.ctx.drawImage(
+    //       this.lightBulb,
+    //       0,
+    //       0,
+    //       this.lightBulb.width,
+    //       this.lightBulb.height,
+    //       topleft.x,
+    //       topleft.y,
+    //       this.lightBulb.width * 0.6,
+    //       this.lightBulb.height * 0.6,
+    //     );
+    //   }
+    // });
+    if (this.animationState.icons.animating) {
+      this.ctx.drawImage(
+        this.lightBulb,
+        0,
+        0,
+        this.lightBulb.width,
+        this.lightBulb.height,
+        bulbToplefts[this.animationState.icons.frameIndex % 14].x,
+        bulbToplefts[this.animationState.icons.frameIndex % 14].y,
+        this.lightBulb.width * 0.6,
+        this.lightBulb.height * 0.6,
+      );
+      this.ctx.drawImage(
+        this.lightDot,
+        0,
+        0,
+        this.lightBulb.width,
+        this.lightBulb.height,
+        dotToplefts[this.animationState.icons.frameIndex % (dotToplefts.length - 1)].x,
+        dotToplefts[this.animationState.icons.frameIndex % (dotToplefts.length - 1)].y,
+        this.lightBulb.width * 0.6,
+        this.lightBulb.height * 0.6,
+      );
+    }
+  }
+
   private updateAnimation() {
     if (this.animationState.lever.animating) {
       this.updateLeverAnimation();
@@ -463,6 +644,7 @@ export class GFX {
 
     this.renderIcons(this.animationState.icons.toplefts);
     this.renderSlotMachine();
+    this.renderLights();
     this.renderLever();
   }
 
