@@ -44,6 +44,7 @@ export class SlotsState {
   private renderBits() {
     this.gfx.renderBits(this.bits);
   }
+
   private handleBitsPlus() {
     if (this.bits < 10000) {
       this.bits += 100;
@@ -62,9 +63,10 @@ export class SlotsState {
     this.gfx.render();
     this.renderBits();
     this.gfx.renderScore(this.score.score);
+    this.gfx.renderAllLights();
   }
+
   private doneAnimating() {
-    console.log('done: ', this);
     this.updateGFX();
   }
 
@@ -74,6 +76,8 @@ export class SlotsState {
     iconsImg: HTMLImageElement[],
     lightDot: HTMLImageElement,
     lightBulb: HTMLImageElement,
+    lightGlowBase: HTMLImageElement,
+    lightGlowScreen: HTMLImageElement,
     canvas: HTMLCanvasElement) {
     this.gfx = new GFX(
       slotImg,
@@ -81,6 +85,8 @@ export class SlotsState {
       iconsImg,
       lightDot,
       lightBulb,
+      lightGlowBase,
+      lightGlowScreen,
       () => { this.doneAnimating() },
     );
     this.gfx.setCanvasRef(canvas);

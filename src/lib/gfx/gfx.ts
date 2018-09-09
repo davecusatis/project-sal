@@ -36,11 +36,13 @@ interface AnimationState {
   animationID?: number;
   lever: GenericAnimationState;
   icons: GenericAnimationState & IconAnimationState;
+  lights: GenericAnimationState;
 }
 
 export class GFX {
   private readonly ICON_BOTTOM = 0.85;
   private readonly ICON_TOP = 0.55;
+  private pos = 0;
 
   private animationState: AnimationState;
   private canvas: HTMLCanvasElement;
@@ -50,6 +52,8 @@ export class GFX {
   private icons: HTMLImageElement[];
   private lightDot: HTMLImageElement;
   private lightBulb: HTMLImageElement;
+  private lightGlowBase: HTMLImageElement;
+  private lightGlowScreen: HTMLImageElement;
   private callbackMap: { [key: string]: Function };
   private doneAnimating: () => void;
 
@@ -59,6 +63,8 @@ export class GFX {
     icons: HTMLImageElement[],
     lightDot: HTMLImageElement,
     lightBulb: HTMLImageElement,
+    lightGlowBase: HTMLImageElement,
+    lightGlowScreen: HTMLImageElement,
     doneAnimating: () => void
   ) {
     this.slotImg = slot;
@@ -66,12 +72,14 @@ export class GFX {
     this.icons = icons;
     this.lightDot = lightDot;
     this.lightBulb = lightBulb;
+    this.lightGlowBase = lightGlowBase;
+    this.lightGlowScreen = lightGlowScreen;
     this.animationState = {
       lever: {
         frameIndex: 0,
         numberOfFrames: 33,
         tickCount: 0,
-        ticksPerFrame: 1,
+        ticksPerFrame: 0,
         width: 52,
         height: 132,
         animating: false,
@@ -84,6 +92,15 @@ export class GFX {
         ticksPerFrame: 0,
         width: 128,
         height: 128 * 3,
+        animating: false,
+      },
+      lights: {
+        frameIndex: 0,
+        numberOfFrames: 30,
+        tickCount: 0,
+        ticksPerFrame: 2,
+        width: 0,
+        height: 0,
         animating: false,
       }
     }
@@ -320,47 +337,7 @@ export class GFX {
       { x: rect.width * 0.87, y: rect.height * 0.135 },
       { x: rect.width * 0.91, y: rect.height * 0.135 },
 
-
-      // bottom row dots
-      // { x: rect.width * 0.07, y: rect.height * 0.515 },
-      { x: rect.width * 0.10, y: rect.height * 0.515 },
-      { x: rect.width * 0.145, y: rect.height * 0.515 },
-      { x: rect.width * 0.19, y: rect.height * 0.515 },
-      { x: rect.width * 0.23, y: rect.height * 0.515 },
-      { x: rect.width * 0.27, y: rect.height * 0.515 },
-      { x: rect.width * 0.31, y: rect.height * 0.515 },
-      { x: rect.width * 0.35, y: rect.height * 0.515 },
-      { x: rect.width * 0.39, y: rect.height * 0.515 },
-      { x: rect.width * 0.43, y: rect.height * 0.515 },
-      { x: rect.width * 0.47, y: rect.height * 0.515 },
-      { x: rect.width * 0.51, y: rect.height * 0.515 },
-      { x: rect.width * 0.55, y: rect.height * 0.515 },
-      { x: rect.width * 0.59, y: rect.height * 0.515 },
-      { x: rect.width * 0.63, y: rect.height * 0.515 },
-      { x: rect.width * 0.67, y: rect.height * 0.515 },
-      { x: rect.width * 0.71, y: rect.height * 0.515 },
-      { x: rect.width * 0.75, y: rect.height * 0.515 },
-      { x: rect.width * 0.79, y: rect.height * 0.515 },
-      { x: rect.width * 0.83, y: rect.height * 0.515 },
-      { x: rect.width * 0.87, y: rect.height * 0.515 },
-      { x: rect.width * 0.91, y: rect.height * 0.515 },
-
       // right side dots
-      // { x: rect.width * 0.07, y: rect.height * 0.515 },
-      { x: rect.width * 0.07, y: rect.height * 0.17 },
-      { x: rect.width * 0.071, y: rect.height * 0.2 },
-      { x: rect.width * 0.072, y: rect.height * 0.23 },
-      { x: rect.width * 0.073, y: rect.height * 0.26 },
-      { x: rect.width * 0.075, y: rect.height * 0.2975 },
-      { x: rect.width * 0.0775, y: rect.height * 0.325 },
-      { x: rect.width * 0.08, y: rect.height * 0.3575 },
-      { x: rect.width * 0.085, y: rect.height * 0.3875 },
-      { x: rect.width * 0.0875, y: rect.height * 0.42 },
-      { x: rect.width * 0.09, y: rect.height * 0.455 },
-      { x: rect.width * 0.0925, y: rect.height * 0.485 },
-      // { x: rect.width * 0.07, y: rect.height * 0.515 },
-
-      // left side dots
       // { x: rect.width * 0.07, y: rect.height * 0.515 },
       { x: rect.width * 0.9, y: rect.height * 0.17 },
       { x: rect.width * 0.897, y: rect.height * 0.2 },
@@ -374,49 +351,48 @@ export class GFX {
       { x: rect.width * 0.883, y: rect.height * 0.455 },
       { x: rect.width * 0.8825, y: rect.height * 0.485 },
       // { x: rect.width * 0.07, y: rect.height * 0.515 },
+
+      // bottom row dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+
+      { x: rect.width * 0.91, y: rect.height * 0.515 },
+      { x: rect.width * 0.87, y: rect.height * 0.515 },
+      { x: rect.width * 0.83, y: rect.height * 0.515 },
+      { x: rect.width * 0.79, y: rect.height * 0.515 },
+      { x: rect.width * 0.75, y: rect.height * 0.515 },
+      { x: rect.width * 0.71, y: rect.height * 0.515 },
+      { x: rect.width * 0.67, y: rect.height * 0.515 },
+      { x: rect.width * 0.63, y: rect.height * 0.515 },
+      { x: rect.width * 0.59, y: rect.height * 0.515 },
+      { x: rect.width * 0.55, y: rect.height * 0.515 },
+      { x: rect.width * 0.51, y: rect.height * 0.515 },
+      { x: rect.width * 0.47, y: rect.height * 0.515 },
+      { x: rect.width * 0.43, y: rect.height * 0.515 },
+      { x: rect.width * 0.39, y: rect.height * 0.515 },
+      { x: rect.width * 0.35, y: rect.height * 0.515 },
+      { x: rect.width * 0.31, y: rect.height * 0.515 },
+      { x: rect.width * 0.23, y: rect.height * 0.515 },
+      { x: rect.width * 0.27, y: rect.height * 0.515 },
+      { x: rect.width * 0.19, y: rect.height * 0.515 },
+      { x: rect.width * 0.145, y: rect.height * 0.515 },
+      { x: rect.width * 0.10, y: rect.height * 0.515 },
+
+      // left side dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+      { x: rect.width * 0.0925, y: rect.height * 0.485 },
+      { x: rect.width * 0.09, y: rect.height * 0.455 },
+      { x: rect.width * 0.0875, y: rect.height * 0.42 },
+      { x: rect.width * 0.085, y: rect.height * 0.3875 },
+      { x: rect.width * 0.08, y: rect.height * 0.3575 },
+      { x: rect.width * 0.0775, y: rect.height * 0.325 },
+      { x: rect.width * 0.075, y: rect.height * 0.2975 },
+      { x: rect.width * 0.073, y: rect.height * 0.26 },
+      { x: rect.width * 0.072, y: rect.height * 0.23 },
+      { x: rect.width * 0.071, y: rect.height * 0.2 },
+      { x: rect.width * 0.07, y: rect.height * 0.17 },
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
     ];
 
-    // dotToplefts.forEach((topleft, index) => {
-    //   this.ctx.drawImage(
-    //     this.lightDot,
-    //     0,
-    //     0,
-    //     this.lightBulb.width,
-    //     this.lightBulb.height,
-    //     topleft.x,
-    //     topleft.y,
-    //     this.lightBulb.width * 0.6,
-    //     this.lightBulb.height * 0.6,
-    //   );
-    // });
-    // bulbToplefts.forEach((topleft, index) => {
-    //   if (index >= 0 && index < 7) {
-    //     this.ctx.drawImage(
-    //       this.lightBulb,
-    //       0,
-    //       0,
-    //       this.lightBulb.width,
-    //       this.lightBulb.height,
-    //       topleft.x,
-    //       topleft.y,
-    //       this.lightBulb.width * 0.6,
-    //       this.lightBulb.height * 0.6,
-    //     );
-    //   } else if (index >= 7 && index < 15) {
-    //     this.ctx.scale(-1, 1);
-    //     this.ctx.drawImage(
-    //       this.lightBulb,
-    //       0,
-    //       0,
-    //       this.lightBulb.width,
-    //       this.lightBulb.height,
-    //       topleft.x,
-    //       topleft.y,
-    //       this.lightBulb.width * 0.6,
-    //       this.lightBulb.height * 0.6,
-    //     );
-    //   }
-    // });
     if (this.animationState.icons.animating) {
       this.ctx.drawImage(
         this.lightBulb,
@@ -443,6 +419,160 @@ export class GFX {
     }
   }
 
+  public renderAllLights() {
+    const rect = this.canvas.getBoundingClientRect();
+    const bulbToplefts = [
+      // left side bulbs
+      { x: -13, y: rect.height * 0.113 },
+      { x: -12, y: rect.height * 0.17 },
+      { x: -11, y: rect.height * 0.2275 },
+      { x: -10, y: rect.height * 0.2835 },
+      { x: -8, y: rect.height * 0.341 },
+      { x: -7, y: rect.height * 0.3975 },
+      { x: -6, y: rect.height * 0.455 },
+
+      // // right side bulbs
+      { x: rect.width * 0.9, y: rect.height * 0.113 },
+      { x: rect.width * 0.9, y: rect.height * 0.17 },
+      { x: rect.width * 0.895, y: rect.height * 0.2275 },
+      { x: rect.width * 0.89, y: rect.height * 0.2835 },
+      { x: rect.width * 0.8875, y: rect.height * 0.341 },
+      { x: rect.width * 0.88, y: rect.height * 0.3975 },
+      { x: rect.width * 0.875, y: rect.height * 0.455 },
+    ];
+
+    const dotToplefts = [
+      // top row dots
+      { x: rect.width * 0.07, y: rect.height * 0.135 },
+      { x: rect.width * 0.11, y: rect.height * 0.135 },
+      { x: rect.width * 0.15, y: rect.height * 0.135 },
+      { x: rect.width * 0.19, y: rect.height * 0.135 },
+      { x: rect.width * 0.23, y: rect.height * 0.135 },
+      { x: rect.width * 0.27, y: rect.height * 0.135 },
+      { x: rect.width * 0.31, y: rect.height * 0.135 },
+      { x: rect.width * 0.35, y: rect.height * 0.135 },
+      { x: rect.width * 0.39, y: rect.height * 0.135 },
+      { x: rect.width * 0.43, y: rect.height * 0.135 },
+      { x: rect.width * 0.47, y: rect.height * 0.135 },
+      { x: rect.width * 0.51, y: rect.height * 0.135 },
+      { x: rect.width * 0.55, y: rect.height * 0.135 },
+      { x: rect.width * 0.59, y: rect.height * 0.135 },
+      { x: rect.width * 0.63, y: rect.height * 0.135 },
+      { x: rect.width * 0.67, y: rect.height * 0.135 },
+      { x: rect.width * 0.71, y: rect.height * 0.135 },
+      { x: rect.width * 0.75, y: rect.height * 0.135 },
+      { x: rect.width * 0.79, y: rect.height * 0.135 },
+      { x: rect.width * 0.83, y: rect.height * 0.135 },
+      { x: rect.width * 0.87, y: rect.height * 0.135 },
+      { x: rect.width * 0.91, y: rect.height * 0.135 },
+
+      // right side dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+      { x: rect.width * 0.9, y: rect.height * 0.17 },
+      { x: rect.width * 0.897, y: rect.height * 0.2 },
+      { x: rect.width * 0.895, y: rect.height * 0.23 },
+      { x: rect.width * 0.894, y: rect.height * 0.26 },
+      { x: rect.width * 0.891, y: rect.height * 0.2975 },
+      { x: rect.width * 0.8875, y: rect.height * 0.325 },
+      { x: rect.width * 0.887, y: rect.height * 0.3575 },
+      { x: rect.width * 0.886, y: rect.height * 0.3875 },
+      { x: rect.width * 0.8875, y: rect.height * 0.42 },
+      { x: rect.width * 0.883, y: rect.height * 0.455 },
+      { x: rect.width * 0.8825, y: rect.height * 0.485 },
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+
+      // bottom row dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+
+      { x: rect.width * 0.91, y: rect.height * 0.515 },
+      { x: rect.width * 0.87, y: rect.height * 0.515 },
+      { x: rect.width * 0.83, y: rect.height * 0.515 },
+      { x: rect.width * 0.79, y: rect.height * 0.515 },
+      { x: rect.width * 0.75, y: rect.height * 0.515 },
+      { x: rect.width * 0.71, y: rect.height * 0.515 },
+      { x: rect.width * 0.67, y: rect.height * 0.515 },
+      { x: rect.width * 0.63, y: rect.height * 0.515 },
+      { x: rect.width * 0.59, y: rect.height * 0.515 },
+      { x: rect.width * 0.55, y: rect.height * 0.515 },
+      { x: rect.width * 0.51, y: rect.height * 0.515 },
+      { x: rect.width * 0.47, y: rect.height * 0.515 },
+      { x: rect.width * 0.43, y: rect.height * 0.515 },
+      { x: rect.width * 0.39, y: rect.height * 0.515 },
+      { x: rect.width * 0.35, y: rect.height * 0.515 },
+      { x: rect.width * 0.31, y: rect.height * 0.515 },
+      { x: rect.width * 0.23, y: rect.height * 0.515 },
+      { x: rect.width * 0.27, y: rect.height * 0.515 },
+      { x: rect.width * 0.19, y: rect.height * 0.515 },
+      { x: rect.width * 0.145, y: rect.height * 0.515 },
+      { x: rect.width * 0.10, y: rect.height * 0.515 },
+
+      // left side dots
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+      { x: rect.width * 0.0925, y: rect.height * 0.485 },
+      { x: rect.width * 0.09, y: rect.height * 0.455 },
+      { x: rect.width * 0.0875, y: rect.height * 0.42 },
+      { x: rect.width * 0.085, y: rect.height * 0.3875 },
+      { x: rect.width * 0.08, y: rect.height * 0.3575 },
+      { x: rect.width * 0.0775, y: rect.height * 0.325 },
+      { x: rect.width * 0.075, y: rect.height * 0.2975 },
+      { x: rect.width * 0.073, y: rect.height * 0.26 },
+      { x: rect.width * 0.072, y: rect.height * 0.23 },
+      { x: rect.width * 0.071, y: rect.height * 0.2 },
+      { x: rect.width * 0.07, y: rect.height * 0.17 },
+      // { x: rect.width * 0.07, y: rect.height * 0.515 },
+    ];
+
+    bulbToplefts.forEach(img => {
+      this.ctx.drawImage(
+        this.lightBulb,
+        0,
+        0,
+        this.lightBulb.width,
+        this.lightBulb.height,
+        img.x,
+        img.y,
+        this.lightBulb.width * 0.6,
+        this.lightBulb.height * 0.6,
+      );
+    });
+    dotToplefts.forEach(img => {
+      this.ctx.drawImage(
+        this.lightDot,
+        0,
+        0,
+        this.lightBulb.width,
+        this.lightBulb.height,
+        img.x,
+        img.y,
+        this.lightBulb.width * 0.6,
+        this.lightBulb.height * 0.6,
+      );
+    });
+    this.ctx.drawImage(
+      this.lightGlowBase,
+      0,
+      0,
+      this.lightGlowBase.width,
+      this.lightGlowBase.height,
+      23,
+      235,
+      this.lightGlowBase.width * 0.55,
+      this.lightGlowBase.height * 0.55,
+    );
+
+    this.ctx.drawImage(
+      this.lightGlowScreen,
+      0,
+      0,
+      this.lightGlowScreen.width,
+      this.lightGlowScreen.height,
+      21,
+      21,
+      this.lightGlowScreen.width * 0.55,
+      this.lightGlowScreen.height * 0.55,
+    );
+  }
+
   private updateAnimation() {
     if (this.animationState.lever.animating) {
       this.updateLeverAnimation();
@@ -463,7 +593,6 @@ export class GFX {
     }
   }
 
-  private pos = 0;
   private updateToplefts() {
     const rect = this.canvas.getBoundingClientRect();
     const bottom = rect.height * this.ICON_BOTTOM;
@@ -473,34 +602,12 @@ export class GFX {
     const pos = this.pos % (128 * n);
     let y = top - ((pos) % 128 + 128);
     let imgIndex = Math.floor(pos / 128);
-    // imgIndex += n * Math.floor((1 + imgIndex / n));
-    // console.log("img index" + imgIndex);
     while (y * this.ICON_BOTTOM - 60 <= bottom) {
       this.animationState.icons.toplefts[imgIndex].y = y;
       y += 60;
       const next = (imgIndex + 1) % n;
-      // console.log(next);
-      imgIndex = next// > n ? 0 : next;
+      imgIndex = next;
     }
-
-    // const rect = this.canvas.getBoundingClientRect();
-    // const bottom = rect.height * this.ICON_BOTTOM;
-    // const top = rect.height * this.ICON_TOP;
-    // console.log(top);
-    // console.log(bottom);
-    // this.animationState.icons.toplefts = this.animationState.icons.toplefts.map(topleft => {
-    //   if (topleft.y < bottom) {
-    //     return {
-    //       x: topleft.x,
-    //       y: topleft.y + (7.68)
-    //     };
-    //   }
-    //   console.log("we've gone passed the bottom");
-    //   return {
-    //     x: topleft.x,
-    //     y: top,
-    //   };
-    // });
   }
 
   private updateIconsAnimation() {
@@ -516,7 +623,36 @@ export class GFX {
         this.animationState.icons.animating = false;
         this.pos = 0;
         cancelAnimationFrame(this.animationState.animationID);
+        this.animationState.lights.animating = true;
+        this.postAnimationLoop();
       }
+    }
+  }
+
+  private updateLights() {
+    this.animationState.lights.tickCount = this.animationState.lights.tickCount + 1;
+    if (this.animationState.lights.tickCount > this.animationState.lights.ticksPerFrame) {
+      this.animationState.lights.tickCount = 0;
+      if (this.animationState.lights.frameIndex < this.animationState.lights.numberOfFrames - 1) {
+        this.animationState.lights.frameIndex += 1;
+      } else {
+        this.animationState.lights.frameIndex = 0;
+        this.animationState.lights.animating = false;
+        cancelAnimationFrame(this.animationState.animationID);
+      }
+    }
+  }
+
+  private postAnimationLoop() {
+    this.animationState.animationID = window.requestAnimationFrame(() => this.postAnimationLoop());
+    this.updateLights();
+    this.render();
+    if (this.animationState.lights.frameIndex % 6 >= 0 &&
+      this.animationState.lights.frameIndex % 6 < 3) {
+      this.renderAllLights();
+    }
+    if (!this.animationState.lights.animating) {
+      this.doneAnimating();
     }
   }
 
@@ -524,9 +660,6 @@ export class GFX {
     this.animationState.animationID = window.requestAnimationFrame(() => this.animationLoop());
     this.updateAnimation();
     this.render();
-    if (!this.animationState.icons.animating) {
-      this.doneAnimating();
-    }
   }
 
   public renderBits(bits: number) {
@@ -641,11 +774,11 @@ export class GFX {
 
   public render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
     this.renderIcons(this.animationState.icons.toplefts);
     this.renderSlotMachine();
     this.renderLights();
     this.renderLever();
+
   }
 
   private renderText(text: string, x: number, y: number) {

@@ -12,6 +12,8 @@ import * as lightDot from '../../assets/img/lightDot.png';
 import * as lightBulb from '../../assets/img/lightBulb.png';
 import * as seven from '../../assets/img/iconSeven.png';
 import * as diamond from '../../assets/img/iconDiamond.png';
+import * as lightGlowBase from '../../assets/img/lightGlowBase.png';
+import * as lightGlowScreen from '../../assets/img/lightGlowScreen.png';
 import { Session } from '../../core/models/session';
 import { SlotsState } from '../../lib/slots/slots';
 import { app } from '../../core/app';
@@ -22,6 +24,8 @@ interface State {
   iconsImg: HTMLImageElement[];
   lightBulb: HTMLImageElement;
   lightDot: HTMLImageElement;
+  lightGlowBase: HTMLImageElement;
+  lightGlowScreen: HTMLImageElement;
   currentBits: number;
   slots: SlotsState;
 }
@@ -44,6 +48,8 @@ export class CanvasComponent extends React.Component<Props, State> {
       leverImg: new Image(),
       lightDot: new Image(),
       lightBulb: new Image(),
+      lightGlowBase: new Image(),
+      lightGlowScreen: new Image(),
       iconsImg: [
         new Image(),
         new Image(),
@@ -69,7 +75,15 @@ export class CanvasComponent extends React.Component<Props, State> {
       new Promise((resolve) => {
         this.state.lightBulb.src = lightBulb;
         this.state.lightBulb.onload = () => resolve(this.state.lightBulb);
-      })];
+      }),
+      new Promise((resolve) => {
+        this.state.lightGlowBase.src = lightGlowBase;
+        this.state.lightGlowBase.onload = () => resolve(this.state.lightGlowBase);
+      }),
+      new Promise((resolve) => {
+        this.state.lightGlowScreen.src = lightGlowScreen;
+        this.state.lightGlowScreen.onload = () => resolve(this.state.lightGlowScreen);
+      }),];
   }
 
   private loadSlots(): Promise<HTMLImageElement> {
@@ -104,6 +118,8 @@ export class CanvasComponent extends React.Component<Props, State> {
       this.state.iconsImg,
       this.state.lightDot,
       this.state.lightBulb,
+      this.state.lightGlowBase,
+      this.state.lightGlowScreen,
       this.canvasRef.current,
     )
   }
