@@ -12,7 +12,7 @@ export const getInitialState = (): SessionState => ({
 });
 
 export function sessionReducer(state = getInitialState(), action: sessionActions.All): SessionState {
-  switch(action.type) {
+  switch (action.type) {
     case sessionActions.ON_AUTHORIZED:
       return {
         ...state,
@@ -29,10 +29,19 @@ export function getSession(state: GlobalState): Session {
 }
 
 export function isLinkedAccount(state: GlobalState): boolean {
-  if(!(state.session && state.session.session)) {
+  if (!(state.session && state.session.session)) {
     return false;
   }
 
   const tokenPayload = JSON.parse(atob(state.session.session.token.split('.')[1]));
   return 'user_id' in tokenPayload;
+}
+
+export function isBroadcaster(state: GlobalState): boolean {
+  if (!(state.session && state.session.session)) {
+    return false;
+  }
+
+  const tokenPayload = JSON.parse(atob(state.session.session.token.split('.')[1]));
+  return tokenPayload.role === 'broadcaster';
 }

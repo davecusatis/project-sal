@@ -7,8 +7,10 @@ const api = new API();
 export const PLAY = 'core.slot-machine.PLAY';
 interface playAction extends Action<typeof PLAY> { }
 
-export const ERROR = 'core.slot-machine.ERROR';
-interface errAction extends Action<typeof ERROR> { }
+export const SET_ALL_SCORES = 'core.slot-machine.SET_ALL_SCORES';
+interface setAllScoresAction extends Action<typeof SET_ALL_SCORES> {
+  scores: Score[];
+}
 
 export const SCORE_RECEIVED = 'core.slot-machine.SCORE_RECEIVED';
 interface scoreReceivedAction extends Action<typeof SCORE_RECEIVED> {
@@ -18,6 +20,7 @@ interface scoreReceivedAction extends Action<typeof SCORE_RECEIVED> {
 export type All = (
   | playAction
   | scoreReceivedAction
+  | setAllScoresAction
 );
 
 export function play(jwt: string): playAction {
@@ -31,5 +34,12 @@ export function scoreUpdated(newScore: Score): scoreReceivedAction {
   return {
     type: SCORE_RECEIVED,
     score: newScore,
+  }
+}
+
+export function setAllScores(scores: Score[]): setAllScoresAction {
+  return {
+    type: SET_ALL_SCORES,
+    scores: scores,
   }
 }

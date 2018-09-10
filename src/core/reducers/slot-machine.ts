@@ -5,6 +5,7 @@ import { Score } from '../models/slot-machine';
 export interface SlotMachineState {
   spinning: boolean;
   lastScore?: Score;
+  scores?: Score[];
 }
 
 export const getInitialState = (): SlotMachineState => ({
@@ -19,6 +20,7 @@ export function slotMachineReducer(state = getInitialState(), action: slotMachin
         spinning: true,
       };
     case slotMachineActions.SCORE_RECEIVED:
+      state.scores.push(action.score);
       return {
         ...state,
         spinning: false,
@@ -35,4 +37,8 @@ export function getLastScore(state: GlobalState): Score {
 
 export function spinning(state: GlobalState): boolean {
   return state.slotMachine && state.slotMachine.spinning;
+}
+
+export function getAllScores(state: GlobalState): Score[] {
+  return state.slotMachine && state.slotMachine.scores;
 }

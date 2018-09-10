@@ -24,7 +24,6 @@ export function onAuthorized(session: Session): onAuthorizedSession {
 }
 
 export function linkIdentity(twitch: Twitch): linkIdentitySession {
-  console.log('linking id', twitch)
   twitch.actions.requestIdShare();
   return {
     type: LINK_IDENTITY

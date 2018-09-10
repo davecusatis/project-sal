@@ -6,9 +6,8 @@ import { Twitch } from '../../core/models/twitch';
 import { linkIdentitySession } from '../../core/actions/session';
 import './component.scss';
 
-interface State {
-  open: boolean;
-}
+interface State { }
+
 export interface PublicProps { }
 export type RouteProps = RouteComponentProps<{}>;
 export interface ReduxStateProps {
