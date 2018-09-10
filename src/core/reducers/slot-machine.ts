@@ -20,11 +20,16 @@ export function slotMachineReducer(state = getInitialState(), action: slotMachin
         spinning: true,
       };
     case slotMachineActions.SCORE_RECEIVED:
-      state.scores.push(action.score);
+      return {
+        ...state,
+        scores: [...state.scores, action.score],
+        lastScore: action.score,
+      };
+    case slotMachineActions.SET_ALL_SCORES:
       return {
         ...state,
         spinning: false,
-        lastScore: action.score,
+        scores: action.scores,
       };
     default:
       return state;

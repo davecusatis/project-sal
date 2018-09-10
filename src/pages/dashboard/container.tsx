@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { getAllScores } from '../../core/reducers/slot-machine';
 import { Dispatch } from 'redux';
 import { Score } from '../../core/models/slot-machine';
-import { setAllScores } from '../../core/actions/slot-machine';
+import { setAllScores, scoreUpdated } from '../../core/actions/slot-machine';
 import { ReduxDispatchProps } from './component';
 
 function mapStateToProps(state: GlobalState): ReduxStateProps {
@@ -19,6 +19,7 @@ function mapStateToProps(state: GlobalState): ReduxStateProps {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     setAllScores: (scores: Score[]) => dispatch(setAllScores(scores)),
+    addNewScore: (score: Score) => dispatch(scoreUpdated(score)),
   }
 }
 

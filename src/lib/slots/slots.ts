@@ -33,7 +33,7 @@ export class SlotsState {
 
   private updateScore(score: Score) {
     this.score = score;
-    this.redux.dispatch(slotActions.scoreUpdated(score));
+    // this.redux.dispatch(slotActions.scoreUpdated(score));
   }
 
   private handleLever() {

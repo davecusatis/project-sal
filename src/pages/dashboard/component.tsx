@@ -18,12 +18,26 @@ export interface ReduxStateProps {
 
 export interface ReduxDispatchProps {
   setAllScores: (scores: Score[]) => void;
+  addNewScore: (score: Score) => void;
 }
 
 type Props = PublicProps & ReduxStateProps & ReduxDispatchProps & RouteProps;
 export class DashboardPageComponent extends React.Component<Props, State> {
   public componentDidMount() {
-    if (this.props.isBroadcaster && !this.props.scores) {
+    window.Twitch.ext.listen('broadcast', (target: any, contentType: any, message: any) => {
+      message = JSON.parse(message);
+      switch (message.type) {
+        case 'scoreUpdated':
+          this.props.addNewScore(message.data.score);
+          break;
+        default:
+          break;
+      }
+    });
+  }
+  public componentDidUpdate() {
+    if (this.props.session && this.props.session.token && !this.props.scores) {
+      console.log('setting scores');
       api.getAllScores(this.props.session.token)
         .then(resp => resp.json())
         .then(scores => this.props.setAllScores(scores));
@@ -34,21 +48,30 @@ export class DashboardPageComponent extends React.Component<Props, State> {
     if (!this.props.isBroadcaster) {
       return null;
     }
+    const scoreHTML = this.props.scores ? this.props.scores.map(score => {
+      return (
+        <div key={score.id}>
+          {score.score} by {score.userId} on {score.channelId} with {score.bitsUsed} <br />
+        </div>
+      );
+    }) : <>No scores yet!</>;
 
-    const { scores } = this.props;
-    const scoreHTML = scores ? scores.map(score => {
-      <>
-        {score.score} by {score.userId} on {score.channelId} with {score.bitsUsed}
-      </>
+    const recentScores = this.props.scores ? this.props.scores.filter((score, index) => {
+      return index >= this.props.scores.length - 3;
+    }).map(score => {
+      return (
+        <div key={score.id}>
+          {score.score} by {score.userId} on {score.channelId} with {score.bitsUsed} <br />
+        </div>
+      );
     }) : <>No scores yet!</>;
 
     return (
       <div>
         Most Recent Scores:
         <br />
-        {scoreHTML}
+        {recentScores}
         <br />
-
         <br />
         Scores This Session:
         <br />

@@ -22,7 +22,6 @@ export class API {
   }
 
   public getAllScores(jwt: string): Promise<Response> {
-    console.log('gettin scores');
     return fetch(this.apiRoot + 'api/v0/scores', {
       method: 'GET',
       headers: {

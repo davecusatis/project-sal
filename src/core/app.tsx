@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { Session } from './models/session';
 import * as sessionActions from './actions/session';
 import * as contextActions from './actions/context';
+import * as slotMachineActions from './actions/slot-machine';
 export let app: App;
 export let config: typeof app.config;
 export let store: typeof app.store;
