@@ -25,7 +25,7 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
 
     return (
       <div>
-        Broadcaster Config bitch
+
       </div>
     );
   }

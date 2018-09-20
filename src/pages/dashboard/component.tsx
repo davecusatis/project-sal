@@ -37,7 +37,6 @@ export class DashboardPageComponent extends React.Component<Props, State> {
   }
   public componentDidUpdate() {
     if (this.props.session && this.props.session.token && !this.props.scores) {
-      console.log('setting scores');
       api.getAllScores(this.props.session.token)
         .then(resp => resp.json())
         .then(scores => this.props.setAllScores(scores));
