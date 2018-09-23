@@ -1,0 +1,17 @@
+.uploader-container {
+    display: flex;
+    margin: auto 10px;
+}
+
+.file-input {
+    margin: auto 10px;
+}
+
+.image-preview {
+    width: 64px;
+    height: 64px;
+}
+
+.upload-errors {
+    color: red;
+}
