@@ -6,6 +6,7 @@ export interface SlotMachineState {
   spinning: boolean;
   lastScore?: Score;
   scores?: Score[];
+  slotMachineTitle?: string;
 }
 
 export const getInitialState = (): SlotMachineState => ({
@@ -24,6 +25,11 @@ export function slotMachineReducer(state = getInitialState(), action: slotMachin
         ...state,
         scores: [...state.scores, action.score],
         lastScore: action.score,
+      };
+    case slotMachineActions.TITLE_RECEIVED:
+      return {
+        ...state,
+        slotMachineTitle: action.title,
       };
     case slotMachineActions.SET_ALL_SCORES:
       return {
@@ -46,4 +52,8 @@ export function spinning(state: GlobalState): boolean {
 
 export function getAllScores(state: GlobalState): Score[] {
   return state.slotMachine && state.slotMachine.scores;
+}
+
+export function getSlotMachineTitle(state: GlobalState): string {
+  return state.slotMachine && state.slotMachine.slotMachineTitle;
 }

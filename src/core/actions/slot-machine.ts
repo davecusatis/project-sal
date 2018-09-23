@@ -17,10 +17,16 @@ interface scoreReceivedAction extends Action<typeof SCORE_RECEIVED> {
   score: Score;
 }
 
+export const TITLE_RECEIVED = 'core.slot-machine.TITLE_RECEIVED';
+interface titleReceivedAction extends Action<typeof TITLE_RECEIVED> {
+  title: string;
+}
+
 export type All = (
   | playAction
   | scoreReceivedAction
   | setAllScoresAction
+  | titleReceivedAction
 );
 
 export function play(jwt: string): playAction {
@@ -42,4 +48,11 @@ export function setAllScores(scores: Score[]): setAllScoresAction {
     type: SET_ALL_SCORES,
     scores: scores,
   }
+}
+
+export function titleReceived(title: string): titleReceivedAction {
+  return {
+    type: TITLE_RECEIVED,
+    title: title,
+  };
 }

@@ -16,23 +16,58 @@ import './component.scss';
 
 const api = new API();
 
-interface State { }
+interface State {
+  slotMachineTitle: string;
+  saveError: string;
+  saveSuccess: string;
+}
 
 export interface PublicProps { }
 export type RouteProps = RouteComponentProps<{}>;
 export interface ReduxStateProps {
   session?: Session;
   isBroadcaster: boolean;
+  title: string;
 }
 
+export interface ReduxDispatchProps {
+  titleReceived: (title: string) => void;
+}
 
-type Props = PublicProps & ReduxStateProps & RouteProps;
+type Props = PublicProps & ReduxStateProps & RouteProps & ReduxDispatchProps;
 export class BroadcasterConfigPageComponent extends React.Component<Props, State> {
-  private onSubmitSlotName(event: React.FormEvent<HTMLFormElement>) {
+  state: State = {
+    slotMachineTitle: '',
+    saveError: '',
+    saveSuccess: '',
+  };
 
+  public componentDidUpdate() {
+    if (this.props.session && this.props.session.channelId && !this.props.title) {
+      api.fetchSlotMachineTitle(this.props.session.channelId)
+        .then(value => value.text())
+        .then(title => {
+          this.props.titleReceived(title.trim());
+          this.setState({
+            slotMachineTitle: title,
+          })
+        })
+        .catch(err => console.log(err));
+    }
+  }
+
+  private onSubmitSlotName(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    console.log(this.state.slotMachineTitle);
+    // api.saveSlotMachineTitle(this.props.session.token, this.state.slotMachineTitle);
+    this.setState({
+      saveSuccess: 'Successfully saved slot machine title.',
+    });
   }
 
   private onSubmitImages(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
     console.log(event.target);
     console.log(event.currentTarget);
   }
@@ -41,14 +76,29 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
     if (!this.props.isBroadcaster) {
       return null;
     }
-
+    const { saveSuccess, saveError } = this.state;
     return (
-      <div className='broadcaster-page'>
-        <div className='slot machine title'>
-          <div>Customize the name of your slot machine</div>
-          <form onSubmit={e => this.onSubmitSlotName(e)} >
-            <input></input>
-          </form>
+      <div className='broadcaster-page' >
+        <div className='slot-machine-title-container'>
+          <div>Customize the title of your slot machine</div>
+          <div className='slot-machine-title-form'>
+            <form onSubmit={e => this.onSubmitSlotName(e)} >
+              <input
+                placeholder='Lucky Leaderboard'
+                value={this.state.slotMachineTitle}
+                onChange={(e) => this.setState({ slotMachineTitle: e.currentTarget.value })}>
+              </input>
+              <button className='broadcaster-button save-title'>Save Title</button>
+              {saveSuccess &&
+                <div>
+                  {saveSuccess}
+                </div>}
+              {saveError &&
+                <div>
+                  {saveError}
+                </div>}
+            </form>
+          </div>
         </div>
         <div className='uploads'>
           <div>
@@ -108,7 +158,7 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
               <ImageUploader assetName='9' />
               <div><div>Replaces</div> <img className='image-preview' src={lime} /></div>
             </div>
-            <button className='submitButton'
+            <button className='broadcaster-button upload-button'
               type='submit'>Upload Images</button>
           </form>
         </div>
