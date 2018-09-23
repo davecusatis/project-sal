@@ -80,6 +80,7 @@ export class ImageUploader extends React.Component<PublicProps, State> {
           </div>}
 
         <input className='file-input'
+          name={this.props.assetName}
           type='file'
           onChange={(e) => this.handleChange(e)} />
 

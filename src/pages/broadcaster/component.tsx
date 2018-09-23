@@ -42,24 +42,34 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
     saveSuccess: '',
   };
 
+  imageFormRef = React.createRef<HTMLFormElement>();
+
   public componentDidUpdate() {
-    if (this.props.session && this.props.session.channelId && !this.props.title) {
+    if (this.props.session && this.props.session.channelId && !this.props.title && !this.state.slotMachineTitle) {
       api.fetchSlotMachineTitle(this.props.session.channelId)
-        .then(value => value.text())
+        .then(value => {
+          if (!value.ok) {
+            return null;
+          }
+          return value.text()
+        })
         .then(title => {
-          this.props.titleReceived(title.trim());
-          this.setState({
-            slotMachineTitle: title,
-          })
+          if (title) {
+            this.props.titleReceived(title.trim());
+            this.setState({
+              slotMachineTitle: title,
+            });
+          }
         })
         .catch(err => console.log(err));
     }
   }
 
   private onSubmitSlotName(event: React.FormEvent<HTMLFormElement>) {
+    const { token, channelId } = this.props.session;
+    const { slotMachineTitle } = this.state;
     event.preventDefault();
-    console.log(this.state.slotMachineTitle);
-    // api.saveSlotMachineTitle(this.props.session.token, this.state.slotMachineTitle);
+    api.saveSlotMachineTitle(token, channelId, slotMachineTitle);
     this.setState({
       saveSuccess: 'Successfully saved slot machine title.',
     });
@@ -67,9 +77,15 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
 
   private onSubmitImages(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    console.log(event.target);
-    console.log(event.currentTarget);
+    console.log(this.imageFormRef.current);
+    const { token, channelId } = this.props.session;
+    api.saveUserImages(token, channelId, new FormData(this.imageFormRef.current))
+      .catch(err => this.setState({
+        saveError: 'Unable to save images.',
+      }));
+    this.setState({
+      saveSuccess: 'Successfully saved images.',
+    });
   }
 
   public render() {
@@ -100,6 +116,7 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
             </form>
           </div>
         </div>
+        <div className='broadcaster-divider' />
         <div className='uploads'>
           <div>
             Upload Custom Slot Images:
@@ -112,50 +129,50 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
               <li>For general image upload concerns refer to: <a href='https://help.twitch.tv/customer/en/portal/articles/2348985-partner-emoticon-and-badge-guide#create'>Twitch's Subscriber Emoticon Guide </a>.</li>
             </ul>
           </div>
-          <form onSubmit={e => this.onSubmitImages(e)} >
+          <form ref={this.imageFormRef} onSubmit={e => this.onSubmitImages(e)} >
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='1' />
+              <ImageUploader assetName='diamond' />
               <div><div>Replaces</div> <img className='image-preview' src={diamond} /></div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='2' />
+              <ImageUploader assetName='bar' />
               <div><div>Replaces</div> <img className='image-preview' src={bar} /></div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='3' />
+              <ImageUploader assetName='bell' />
               <div><div>Replaces</div> <img className='image-preview' src={bell} /></div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='4' />
+              <ImageUploader assetName='cherries' />
               <div><div>Replaces</div> <img className='image-preview' src={cherries} /></div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='5' />
+              <ImageUploader assetName='coin' />
               <div><div>Replaces</div> <img className='image-preview' src={coin} /></div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='6' />
+              <ImageUploader assetName='horseshoe' />
               <div><div>Replaces</div> <img className='image-preview' src={horseshoe} /></div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='7' />
+              <ImageUploader assetName='seven' />
               <div><div>Replaces</div> <img className='image-preview' src={seven} /></div>
               <div className='seven-text'>Seven is special in Lucky Leaderboard. Getting 3 of these is the Jackpot score. Upload a special image for this one!</div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='8' />
+              <ImageUploader assetName='plum' />
               <div><div>Replaces</div> <img className='image-preview' src={plum} /></div>
             </div>
 
             <div className='broadcaster-upload-container'>
-              <ImageUploader assetName='9' />
+              <ImageUploader assetName='lime' />
               <div><div>Replaces</div> <img className='image-preview' src={lime} /></div>
             </div>
             <button className='broadcaster-button upload-button'
