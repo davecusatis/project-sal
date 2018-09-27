@@ -1,4 +1,4 @@
-const prod = false;
+const prod = true;
 
 export class API {
   private apiRoot = prod ? 'https://project-sal.dotstarmoney.com' : 'http://localhost:3030';

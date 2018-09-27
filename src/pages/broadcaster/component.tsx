@@ -96,6 +96,8 @@ export class BroadcasterConfigPageComponent extends React.Component<Props, State
     return (
       <div className='broadcaster-page' >
         <div className='slot-machine-title-container'>
+          <div>Lucky Leaderboard Configuration</div>
+          <div>Customize your slot machine! Upload your own images, sounds, and change the title of your slot machine. Please give it a few minutes after submiting your customizations for it to become active in your channel.</div>
           <div>Customize the title of your slot machine</div>
           <div className='slot-machine-title-form'>
             <form onSubmit={e => this.onSubmitSlotName(e)} >
