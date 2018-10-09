@@ -1,4 +1,4 @@
-const prod = true;
+const prod = false;
 
 export class API {
   private apiRoot = prod ? 'https://project-sal.dotstarmoney.com' : 'http://localhost:3030';
@@ -48,6 +48,15 @@ export class API {
         'authorization': `Bearer ${jwt}`,
       },
       body: formData,
+    });
+  }
+
+  public fetchCustomAssetStatus(userId: string): Promise<Response> {
+    return fetch(`${this.cloudFrontRoot}/${userId}/custom`, {
+      method: 'GET',
+      headers: {
+        'content-type': 'text/plain',
+      }
     });
   }
 
